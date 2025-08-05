@@ -1,0 +1,243 @@
+.index {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.welcome-section {
+  padding: 40px 20px 30px;
+  text-align: center;
+  color: white;
+}
+
+.welcome-header {
+  margin-bottom: 30px;
+}
+
+.welcome-title {
+  display: block;
+  font-size: 28px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.welcome-subtitle {
+  display: block;
+  font-size: 16px;
+  opacity: 0.9;
+}
+
+.user-info {
+  margin-top: 20px;
+}
+
+.user-avatar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.avatar {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  margin-bottom: 10px;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+}
+
+.username {
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.feature-section {
+  background: white;
+  margin: 20px;
+  border-radius: 16px;
+  padding: 30px 20px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.identify-btn {
+  width: 100%;
+  height: 50px;
+  border-radius: 25px;
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 30px;
+  background: linear-gradient(45deg, #07c160, #10ad6a);
+  border: none;
+  
+  &:active {
+    transform: scale(0.98);
+  }
+}
+
+.feature-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.feature-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  background: #f8f9fa;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+  
+  &:active {
+    transform: scale(0.95);
+    background: #e9ecef;
+  }
+}
+
+.feature-text {
+  margin-top: 10px;
+  font-size: 14px;
+  color: #333;
+  font-weight: 500;
+}
+
+.recent-section {
+  margin: 20px;
+  background: white;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.section-title {
+  font-size: 18px;
+  font-weight: bold;
+  color: #333;
+}
+
+.section-more {
+  font-size: 14px;
+  color: #07c160;
+}
+
+.recent-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.recent-item {
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.recent-content {
+  display: flex;
+  align-items: center;
+  padding: 10px 0;
+}
+
+.recent-image {
+  width: 60px;
+  height: 60px;
+  border-radius: 8px;
+  margin-right: 15px;
+}
+
+.recent-info {
+  flex: 1;
+}
+
+.recent-name {
+  display: block;
+  font-size: 16px;
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 5px;
+}
+
+.recent-date {
+  display: block;
+  font-size: 12px;
+  color: #999;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40px 20px;
+  text-align: center;
+}
+
+.empty-text {
+  display: block;
+  font-size: 16px;
+  color: #666;
+  margin-top: 15px;
+  margin-bottom: 5px;
+}
+
+.empty-subtext {
+  display: block;
+  font-size: 14px;
+  color: #999;
+}
+
+// 移动端适配
+@media screen and (max-width: 375px) {
+  .welcome-section {
+    padding: 30px 15px 20px;
+  }
+  
+  .feature-section {
+    margin: 15px;
+    padding: 20px 15px;
+  }
+  
+  .recent-section {
+    margin: 15px;
+    padding: 15px;
+  }
+  
+  .welcome-title {
+    font-size: 24px;
+  }
+  
+  .identify-btn {
+    height: 45px;
+    font-size: 16px;
+  }
+}
+
+@media screen and (min-width: 414px) {
+  .welcome-section {
+    padding: 50px 25px 40px;
+  }
+  
+  .feature-section {
+    margin: 25px;
+    padding: 40px 25px;
+  }
+  
+  .recent-section {
+    margin: 25px;
+    padding: 25px;
+  }
+  
+  .welcome-title {
+    font-size: 32px;
+  }
+  
+  .identify-btn {
+    height: 55px;
+    font-size: 20px;
+  }
+} 

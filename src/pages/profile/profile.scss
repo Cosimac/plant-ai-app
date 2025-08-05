@@ -1,0 +1,153 @@
+.profile {
+  min-height: 100vh;
+  background: #f8f8f8;
+}
+
+.user-section {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 40px 20px 30px;
+  color: white;
+}
+
+.user-header {
+  margin-bottom: 30px;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+}
+
+.user-avatar {
+  margin-right: 20px;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+}
+
+.user-details {
+  flex: 1;
+}
+
+.user-name {
+  display: block;
+  font-size: 20px;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.user-desc {
+  display: block;
+  font-size: 14px;
+  opacity: 0.9;
+}
+
+.statistics {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 30px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 20px;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.stat-number {
+  display: block;
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.stat-label {
+  display: block;
+  font-size: 12px;
+  opacity: 0.8;
+}
+
+.auth-section {
+  text-align: center;
+}
+
+.menu-section {
+  margin: 20px;
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.version-section {
+  text-align: center;
+  padding: 30px 20px;
+  color: #999;
+}
+
+.version-text {
+  display: block;
+  font-size: 14px;
+  margin-bottom: 10px;
+}
+
+.copyright-text {
+  display: block;
+  font-size: 12px;
+  opacity: 0.7;
+}
+
+// 移动端适配
+@media screen and (max-width: 375px) {
+  .user-section {
+    padding: 30px 15px 20px;
+  }
+  
+  .user-name {
+    font-size: 18px;
+  }
+  
+  .statistics {
+    padding: 15px;
+  }
+  
+  .stat-number {
+    font-size: 20px;
+  }
+  
+  .menu-section {
+    margin: 15px;
+  }
+  
+  .version-section {
+    padding: 20px 15px;
+  }
+}
+
+@media screen and (min-width: 414px) {
+  .user-section {
+    padding: 50px 25px 40px;
+  }
+  
+  .user-name {
+    font-size: 22px;
+  }
+  
+  .statistics {
+    padding: 25px;
+  }
+  
+  .stat-number {
+    font-size: 28px;
+  }
+  
+  .menu-section {
+    margin: 25px;
+  }
+  
+  .version-section {
+    padding: 40px 25px;
+  }
+} 

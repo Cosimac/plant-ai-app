@@ -1,0 +1,26 @@
+{
+  "miniprogramRoot": "./dist",
+  "projectname": "花草识AI",
+  "description": "基于Taro的植物识别AI小程序",
+  "appid": "your-app-id-here",
+  "setting": {
+    "urlCheck": true,
+    "es6": false,
+    "enhance": false,
+    "compileHotReLoad": false,
+    "postcss": false,
+    "minified": false
+  },
+  "compileType": "miniprogram",
+  "libVersion": "2.19.4",
+  "srcMiniprogramRoot": "./dist",
+  "packOptions": {
+    "ignore": [],
+    "include": []
+  },
+  "condition": {},
+  "editorSetting": {
+    "tabIndent": "insertSpaces",
+    "tabSize": 2
+  }
+} 
