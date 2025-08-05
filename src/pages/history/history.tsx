@@ -2,16 +2,20 @@ import { Component } from 'react'
 import { View, Text, Image, ScrollView } from '@tarojs/components'
 import { AtCard, AtIcon, AtButton, AtSearchBar, AtTabs, AtTabsPane } from 'taro-ui'
 import Taro from '@tarojs/taro'
+import cloud from '../../utils/cloud'
 import './history.scss'
 
 interface HistoryItem {
-  id: string;
+  _id: string;
   name: string;
   scientificName: string;
   image: string;
   date: string;
   accuracy: string;
   isFavorite: boolean;
+  result: any;
+  createTime: Date;
+  updateTime: Date;
 }
 
 interface State {
@@ -19,6 +23,7 @@ interface State {
   currentTab: number;
   historyList: HistoryItem[];
   favoritesList: HistoryItem[];
+  loading: boolean;
 }
 
 export default class History extends Component<{}, State> {
@@ -26,58 +31,39 @@ export default class History extends Component<{}, State> {
     searchValue: '',
     currentTab: 0,
     historyList: [],
-    favoritesList: []
+    favoritesList: [],
+    loading: false
   }
 
   componentDidMount(): void {
+    // 初始化云开发
+    cloud.init()
     this.loadHistoryData()
   }
 
-  loadHistoryData(): void {
-    // 模拟加载历史数据
-    const mockHistory: HistoryItem[] = [
-      {
-        id: '1',
-        name: '月季花',
-        scientificName: 'Rosa chinensis',
-        image: 'https://via.placeholder.com/80x80',
-        date: '2024-01-15 14:30',
-        accuracy: '95%',
-        isFavorite: true
-      },
-      {
-        id: '2',
-        name: '向日葵',
-        scientificName: 'Helianthus annuus',
-        image: 'https://via.placeholder.com/80x80',
-        date: '2024-01-14 16:20',
-        accuracy: '92%',
-        isFavorite: false
-      },
-      {
-        id: '3',
-        name: '玫瑰',
-        scientificName: 'Rosa rugosa',
-        image: 'https://via.placeholder.com/80x80',
-        date: '2024-01-13 10:15',
-        accuracy: '88%',
-        isFavorite: true
-      },
-      {
-        id: '4',
-        name: '百合',
-        scientificName: 'Lilium brownii',
-        image: 'https://via.placeholder.com/80x80',
-        date: '2024-01-12 09:45',
-        accuracy: '90%',
-        isFavorite: false
-      }
-    ]
-
-    this.setState({
-      historyList: mockHistory,
-      favoritesList: mockHistory.filter(item => item.isFavorite)
-    })
+  loadHistoryData = async (): Promise<void> => {
+    this.setState({ loading: true })
+    
+    try {
+      // 获取所有历史记录
+      const allHistory = await cloud.plantAPI.getHistory(50, 0, 'all')
+      
+      // 获取收藏记录
+      const favorites = await cloud.plantAPI.getHistory(50, 0, 'favorites')
+      
+      this.setState({
+        historyList: allHistory,
+        favoritesList: favorites,
+        loading: false
+      })
+    } catch (error) {
+      console.error('加载历史数据失败:', error)
+      Taro.showToast({
+        title: '加载失败',
+        icon: 'none'
+      })
+      this.setState({ loading: false })
+    }
   }
 
   handleSearchChange = (value: string): void => {
@@ -88,53 +74,78 @@ export default class History extends Component<{}, State> {
     this.setState({ currentTab: value })
   }
 
-  handleToggleFavorite = (itemId: string): void => {
+  handleToggleFavorite = async (itemId: string): Promise<void> => {
     const { historyList, favoritesList } = this.state
-    const updatedHistory = historyList.map(item => {
-      if (item.id === itemId) {
-        return { ...item, isFavorite: !item.isFavorite }
-      }
-      return item
-    })
+    const item = historyList.find(item => item._id === itemId)
+    
+    if (!item) return
+    
+    try {
+      await cloud.plantAPI.updateFavorite(itemId, !item.isFavorite)
+      
+      // 更新本地状态
+      const updatedHistory = historyList.map(item => {
+        if (item._id === itemId) {
+          return { ...item, isFavorite: !item.isFavorite }
+        }
+        return item
+      })
 
-    const updatedFavorites = updatedHistory.filter(item => item.isFavorite)
+      const updatedFavorites = updatedHistory.filter(item => item.isFavorite)
 
-    this.setState({
-      historyList: updatedHistory,
-      favoritesList: updatedFavorites
-    })
+      this.setState({
+        historyList: updatedHistory,
+        favoritesList: updatedFavorites
+      })
 
-    Taro.showToast({
-      title: '收藏状态已更新',
-      icon: 'success'
-    })
+      Taro.showToast({
+        title: '收藏状态已更新',
+        icon: 'success'
+      })
+    } catch (error) {
+      console.error('更新收藏状态失败:', error)
+      Taro.showToast({
+        title: '更新失败',
+        icon: 'none'
+      })
+    }
   }
 
   handleViewDetail = (item: HistoryItem): void => {
     Taro.navigateTo({
-      url: `/pages/detail/detail?id=${item.id}`
+      url: `/pages/detail/detail?id=${item._id}`
     })
   }
 
-  handleDeleteItem = (itemId: string): void => {
+  handleDeleteItem = async (itemId: string): Promise<void> => {
     Taro.showModal({
       title: '确认删除',
       content: '确定要删除这条识别记录吗？',
-      success: (res) => {
+      success: async (res) => {
         if (res.confirm) {
-          const { historyList, favoritesList } = this.state
-          const updatedHistory = historyList.filter(item => item.id !== itemId)
-          const updatedFavorites = favoritesList.filter(item => item.id !== itemId)
+          try {
+            await cloud.plantAPI.deleteRecord(itemId)
+            
+            const { historyList, favoritesList } = this.state
+            const updatedHistory = historyList.filter(item => item._id !== itemId)
+            const updatedFavorites = favoritesList.filter(item => item._id !== itemId)
 
-          this.setState({
-            historyList: updatedHistory,
-            favoritesList: updatedFavorites
-          })
+            this.setState({
+              historyList: updatedHistory,
+              favoritesList: updatedFavorites
+            })
 
-          Taro.showToast({
-            title: '删除成功',
-            icon: 'success'
-          })
+            Taro.showToast({
+              title: '删除成功',
+              icon: 'success'
+            })
+          } catch (error) {
+            console.error('删除记录失败:', error)
+            Taro.showToast({
+              title: '删除失败',
+              icon: 'none'
+            })
+          }
         }
       }
     })
@@ -143,13 +154,13 @@ export default class History extends Component<{}, State> {
   renderHistoryItem = (item: HistoryItem): React.ReactNode => {
     return (
       <AtCard
-        key={item.id}
+        key={item._id}
         className='history-item'
         title={item.name}
         extra={`准确率: ${item.accuracy}`}
       >
         <View className='history-content'>
-          <Image src={item.image} className='history-image' />
+          <Image src={item.image || 'https://via.placeholder.com/80x80'} className='history-image' />
           <View className='history-info'>
             <Text className='history-scientific'>{item.scientificName}</Text>
             <Text className='history-date'>{item.date}</Text>
@@ -166,7 +177,7 @@ export default class History extends Component<{}, State> {
               size='small' 
               type={item.isFavorite ? 'primary' : 'secondary'}
               className='action-btn'
-              onClick={() => this.handleToggleFavorite(item.id)}
+              onClick={() => this.handleToggleFavorite(item._id)}
             >
               {item.isFavorite ? '取消收藏' : '收藏'}
             </AtButton>
@@ -174,7 +185,7 @@ export default class History extends Component<{}, State> {
               size='small' 
               type='secondary'
               className='action-btn delete-btn'
-              onClick={() => this.handleDeleteItem(item.id)}
+              onClick={() => this.handleDeleteItem(item._id)}
             >
               删除
             </AtButton>
@@ -185,7 +196,7 @@ export default class History extends Component<{}, State> {
   }
 
   render(): React.ReactNode {
-    const { searchValue, currentTab, historyList, favoritesList } = this.state
+    const { searchValue, currentTab, historyList, favoritesList, loading } = this.state
 
     const filteredHistory = historyList.filter(item => 
       item.name.toLowerCase().includes(searchValue.toLowerCase()) ||
@@ -224,7 +235,12 @@ export default class History extends Component<{}, State> {
             >
               <AtTabsPane current={currentTab} index={0}>
                 <ScrollView className='history-list' scrollY>
-                  {filteredHistory.length > 0 ? (
+                  {loading ? (
+                    <View className='loading-state'>
+                      <AtIcon value='loading' size='30' color='#07c160' />
+                      <Text className='loading-text'>加载中...</Text>
+                    </View>
+                  ) : filteredHistory.length > 0 ? (
                     filteredHistory.map(item => this.renderHistoryItem(item))
                   ) : (
                     <View className='empty-state'>
@@ -238,7 +254,12 @@ export default class History extends Component<{}, State> {
               
               <AtTabsPane current={currentTab} index={1}>
                 <ScrollView className='history-list' scrollY>
-                  {filteredFavorites.length > 0 ? (
+                  {loading ? (
+                    <View className='loading-state'>
+                      <AtIcon value='loading' size='30' color='#07c160' />
+                      <Text className='loading-text'>加载中...</Text>
+                    </View>
+                  ) : filteredFavorites.length > 0 ? (
                     filteredFavorites.map(item => this.renderHistoryItem(item))
                   ) : (
                     <View className='empty-state'>

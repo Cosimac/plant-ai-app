@@ -1,9 +1,58 @@
-import { CloudUtils, UserInfo, IdentificationRecord, IdentificationResult, DatabaseResult, CloudFunctionResult } from '../../types/global'
+import Taro from '@tarojs/taro'
+
+// 声明全局 wx 对象
+declare const wx: any;
+
+// 类型定义
+interface UserInfo {
+  openid: string;
+  nickName: string;
+  avatarUrl: string;
+  createTime: Date;
+  updateTime: Date;
+}
+
+interface PlantResult {
+  name: string;
+  scientificName: string;
+  family: string;
+  accuracy: string;
+  description: string;
+  characteristics: string[];
+  careTips: string[];
+  baikeInfo?: any;
+  allResults?: any[];
+}
+
+interface IdentificationRecord {
+  _id: string;
+  openid: string;
+  name: string;
+  scientificName: string;
+  image: string;
+  date: string;
+  accuracy: string;
+  isFavorite: boolean;
+  result: PlantResult;
+  createTime: Date;
+  updateTime: Date;
+}
+
+interface CloudFunctionResult<T = any> {
+  success: boolean;
+  data?: T;
+  message?: string;
+}
+
+interface DatabaseResult {
+  _id: string;
+  errMsg: string;
+}
 
 // 腾讯云开发配置
-const cloud: CloudUtils = {
+const cloud = {
   // 云开发环境ID
-  envId: 'your-env-id',
+  envId: 'cloud1-7gkups8e633f1074',
   
   // 初始化云开发
   init() {
@@ -16,27 +65,31 @@ const cloud: CloudUtils = {
   },
 
   // 调用云函数
-  callFunction<T = any>(name: string, data: any = {}): Promise<CloudFunctionResult<T>> {
-    return new Promise((resolve, reject) => {
-      wx.cloud.callFunction({
+  async callFunction<T = any>(name: string, data: any = {}): Promise<CloudFunctionResult<T>> {
+    try {
+      const result = await wx.cloud.callFunction({
         name,
-        data,
-        success: resolve,
-        fail: reject
+        data
       })
-    })
+      return result.result
+    } catch (error) {
+      console.error(`调用云函数 ${name} 失败:`, error)
+      throw error
+    }
   },
 
   // 上传文件
-  uploadFile(filePath: string, cloudPath: string): Promise<any> {
-    return new Promise((resolve, reject) => {
-      wx.cloud.uploadFile({
+  async uploadFile(filePath: string, cloudPath: string): Promise<any> {
+    try {
+      const result = await wx.cloud.uploadFile({
         cloudPath,
-        filePath,
-        success: resolve,
-        fail: reject
+        filePath
       })
-    })
+      return result
+    } catch (error) {
+      console.error('上传文件失败:', error)
+      throw error
+    }
   },
 
   // 获取数据库引用
@@ -47,12 +100,17 @@ const cloud: CloudUtils = {
   // 植物识别相关API
   plantAPI: {
     // 识别植物
-    async identifyPlant(imageUrl: string): Promise<IdentificationResult> {
+    async identifyPlant(imageUrl: string): Promise<PlantResult> {
       try {
         const result = await cloud.callFunction('identifyPlant', {
           imageUrl
         })
-        return result.result
+        
+        if (!result.success) {
+          throw new Error(result.message || '识别失败')
+        }
+        
+        return result.data
       } catch (error) {
         console.error('植物识别失败:', error)
         throw error
@@ -62,15 +120,15 @@ const cloud: CloudUtils = {
     // 保存识别记录
     async saveRecord(record: Partial<IdentificationRecord>): Promise<DatabaseResult> {
       try {
-        const db = cloud.database()
-        const result = await db.collection('identifications').add({
-          data: {
-            ...record,
-            createTime: new Date(),
-            updateTime: new Date()
-          }
+        const result = await cloud.callFunction('saveRecord', {
+          record
         })
-        return result
+        
+        if (!result.success) {
+          throw new Error(result.message || '保存失败')
+        }
+        
+        return result.data
       } catch (error) {
         console.error('保存记录失败:', error)
         throw error
@@ -78,14 +136,18 @@ const cloud: CloudUtils = {
     },
 
     // 获取识别历史
-    async getHistory(limit: number = 20, offset: number = 0): Promise<IdentificationRecord[]> {
+    async getHistory(limit: number = 20, offset: number = 0, type: 'all' | 'favorites' = 'all'): Promise<IdentificationRecord[]> {
       try {
-        const db = cloud.database()
-        const result = await db.collection('identifications')
-          .orderBy('createTime', 'desc')
-          .skip(offset)
-          .limit(limit)
-          .get()
+        const result = await cloud.callFunction('getHistory', {
+          limit,
+          offset,
+          type
+        })
+        
+        if (!result.success) {
+          throw new Error(result.message || '获取历史记录失败')
+        }
+        
         return result.data
       } catch (error) {
         console.error('获取历史记录失败:', error)
@@ -96,16 +158,16 @@ const cloud: CloudUtils = {
     // 更新收藏状态
     async updateFavorite(id: string, isFavorite: boolean): Promise<any> {
       try {
-        const db = cloud.database()
-        const result = await db.collection('identifications')
-          .doc(id)
-          .update({
-            data: {
-              isFavorite,
-              updateTime: new Date()
-            }
-          })
-        return result
+        const result = await cloud.callFunction('updateFavorite', {
+          id,
+          isFavorite
+        })
+        
+        if (!result.success) {
+          throw new Error(result.message || '更新收藏状态失败')
+        }
+        
+        return result.data
       } catch (error) {
         console.error('更新收藏状态失败:', error)
         throw error
@@ -115,11 +177,15 @@ const cloud: CloudUtils = {
     // 删除记录
     async deleteRecord(id: string): Promise<any> {
       try {
-        const db = cloud.database()
-        const result = await db.collection('identifications')
-          .doc(id)
-          .remove()
-        return result
+        const result = await cloud.callFunction('deleteRecord', {
+          id
+        })
+        
+        if (!result.success) {
+          throw new Error(result.message || '删除记录失败')
+        }
+        
+        return result.data
       } catch (error) {
         console.error('删除记录失败:', error)
         throw error
@@ -133,7 +199,12 @@ const cloud: CloudUtils = {
     async getUserInfo(): Promise<UserInfo> {
       try {
         const result = await cloud.callFunction('getUserInfo')
-        return result.result
+        
+        if (!result.success) {
+          throw new Error(result.message || '获取用户信息失败')
+        }
+        
+        return result.data
       } catch (error) {
         console.error('获取用户信息失败:', error)
         throw error
@@ -141,7 +212,7 @@ const cloud: CloudUtils = {
     },
 
     // 更新用户信息
-    async updateUserInfo(userInfo: UserInfo): Promise<DatabaseResult> {
+    async updateUserInfo(userInfo: Partial<UserInfo>): Promise<DatabaseResult> {
       try {
         const db = cloud.database()
         const result = await db.collection('users').add({

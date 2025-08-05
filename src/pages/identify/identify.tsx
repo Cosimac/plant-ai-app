@@ -2,6 +2,7 @@ import { Component } from 'react'
 import { View, Text, Image, Camera } from '@tarojs/components'
 import { AtButton, AtModal, AtModalHeader, AtModalContent, AtModalAction, AtIcon } from 'taro-ui'
 import Taro from '@tarojs/taro'
+import cloud from '../../utils/cloud'
 import './identify.scss'
 
 interface PlantResult {
@@ -12,6 +13,8 @@ interface PlantResult {
   description: string;
   characteristics: string[];
   careTips: string[];
+  baikeInfo?: any;
+  allResults?: any[];
 }
 
 interface State {
@@ -35,6 +38,8 @@ export default class Identify extends Component<{}, State> {
 
   componentDidMount(): void {
     this.initCamera()
+    // 初始化云开发
+    cloud.init()
   }
 
   componentWillUnmount(): void {
@@ -70,35 +75,35 @@ export default class Identify extends Component<{}, State> {
     })
   }
 
-  identifyPlant = (imagePath: string): void => {
-    // 模拟AI识别过程
-    setTimeout(() => {
-      const mockResult: PlantResult = {
-        name: '月季花',
-        scientificName: 'Rosa chinensis',
-        family: '蔷薇科',
-        accuracy: '95%',
-        description: '月季花是蔷薇科蔷薇属植物，原产于中国，是著名的观赏花卉。',
-        characteristics: [
-          '花瓣重瓣或半重瓣',
-          '花色丰富多样',
-          '花期较长',
-          '适应性强'
-        ],
-        careTips: [
-          '喜欢阳光充足的环境',
-          '需要疏松肥沃的土壤',
-          '定期修剪促进开花',
-          '注意防治病虫害'
-        ]
-      }
+  identifyPlant = async (imagePath: string): Promise<void> => {
+    try {
+      // 上传图片到云存储
+      const uploadResult = await cloud.uploadFile(
+        imagePath,
+        `plants/${Date.now()}_${Math.random().toString(36).substr(2, 9)}.jpg`
+      )
+
+      // 调用百度植物识别API
+      const plantResult = await cloud.plantAPI.identifyPlant(uploadResult.fileID)
 
       this.setState({
-        result: mockResult,
+        result: plantResult,
         isIdentifying: false,
         showResult: true
       })
-    }, 2000)
+
+      Taro.showToast({
+        title: '识别成功',
+        icon: 'success'
+      })
+    } catch (error) {
+      console.error('植物识别失败:', error)
+      Taro.showToast({
+        title: error.message || '识别失败',
+        icon: 'none'
+      })
+      this.setState({ isIdentifying: false })
+    }
   }
 
   handleChooseImage = (): void => {
@@ -106,9 +111,16 @@ export default class Identify extends Component<{}, State> {
       count: 1,
       sizeType: ['compressed'],
       sourceType: ['album'],
-      success: (res: any) => {
+      success: async (res: any) => {
         this.setState({ isIdentifying: true })
-        this.identifyPlant(res.tempFilePaths[0])
+        await this.identifyPlant(res.tempFilePaths[0])
+      },
+      fail: (error: any) => {
+        console.error('选择图片失败:', error)
+        Taro.showToast({
+          title: '选择图片失败',
+          icon: 'none'
+        })
       }
     })
   }
@@ -123,14 +135,34 @@ export default class Identify extends Component<{}, State> {
     this.setState({ showResult: false })
   }
 
-  handleSaveResult = (): void => {
+  handleSaveResult = async (): Promise<void> => {
     const { result } = this.state
-    // 保存识别结果到历史记录
-    Taro.showToast({
-      title: '已保存到历史记录',
-      icon: 'success'
-    })
-    this.setState({ showResult: false })
+    if (!result) return
+
+    try {
+      // 保存识别结果到数据库
+      await cloud.plantAPI.saveRecord({
+        name: result.name,
+        scientificName: result.scientificName,
+        image: '', // 这里可以保存图片路径
+        date: new Date().toLocaleString(),
+        accuracy: result.accuracy,
+        isFavorite: false,
+        result: result
+      })
+
+      Taro.showToast({
+        title: '已保存到历史记录',
+        icon: 'success'
+      })
+      this.setState({ showResult: false })
+    } catch (error) {
+      console.error('保存记录失败:', error)
+      Taro.showToast({
+        title: '保存失败',
+        icon: 'none'
+      })
+    }
   }
 
   render(): React.ReactNode {
@@ -156,8 +188,8 @@ export default class Identify extends Component<{}, State> {
                   }}
                 />
                 <View className='camera-controls'>
-                  <AtButton
-                    circle
+                  <AtButton 
+                    circle 
                     size='normal'
                     className='capture-btn'
                     onClick={this.takePhoto}
@@ -165,8 +197,8 @@ export default class Identify extends Component<{}, State> {
                   >
                     <AtIcon value='camera' size='30' color='white' />
                   </AtButton>
-                  <AtButton
-                    circle
+                  <AtButton 
+                    circle 
                     size='small'
                     className='switch-btn'
                     onClick={this.handleSwitchCamera}
@@ -186,8 +218,8 @@ export default class Identify extends Component<{}, State> {
           {/* 操作按钮 */}
           <View className='action-section'>
             <View className='action-buttons'>
-              <AtButton
-                type='primary'
+              <AtButton 
+                type='primary' 
                 size='normal'
                 className='action-btn'
                 onClick={() => this.setState({ showCamera: true })}
@@ -195,9 +227,9 @@ export default class Identify extends Component<{}, State> {
                 <AtIcon value='camera' size='20' />
                 拍照识别
               </AtButton>
-
-              <AtButton
-                type='secondary'
+              
+              <AtButton 
+                type='secondary' 
                 size='normal'
                 className='action-btn'
                 onClick={this.handleChooseImage}
@@ -236,12 +268,12 @@ export default class Identify extends Component<{}, State> {
                     <Text className='scientific-name'>{result.scientificName}</Text>
                     <Text className='accuracy'>准确率: {result.accuracy}</Text>
                   </View>
-
+                  
                   <View className='result-section'>
                     <Text className='section-title'>植物描述</Text>
                     <Text className='description'>{result.description}</Text>
                   </View>
-
+                  
                   <View className='result-section'>
                     <Text className='section-title'>主要特征</Text>
                     <View className='characteristics'>
@@ -250,7 +282,7 @@ export default class Identify extends Component<{}, State> {
                       ))}
                     </View>
                   </View>
-
+                  
                   <View className='result-section'>
                     <Text className='section-title'>养护建议</Text>
                     <View className='care-tips'>

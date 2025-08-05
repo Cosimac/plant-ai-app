@@ -2,15 +2,19 @@ import { Component } from 'react'
 import { View, Text, Image } from '@tarojs/components'
 import { AtButton, AtCard, AtIcon } from 'taro-ui'
 import Taro from '@tarojs/taro'
+import cloud from '../../utils/cloud'
 import './index.scss'
 
 interface UserInfo {
-  avatarUrl: string;
+  openid: string;
   nickName: string;
+  avatarUrl: string;
+  createTime: Date;
+  updateTime: Date;
 }
 
 interface IdentificationItem {
-  id: string;
+  _id: string;
   name: string;
   scientificName: string;
   image: string;
@@ -22,55 +26,57 @@ interface IdentificationItem {
 interface State {
   userInfo: UserInfo | null;
   recentIdentifications: IdentificationItem[];
+  loading: boolean;
 }
 
 export default class Index extends Component<{}, State> {
   state: State = {
     userInfo: null,
-    recentIdentifications: []
+    recentIdentifications: [],
+    loading: false
   }
 
   componentDidMount(): void {
+    // 初始化云开发
+    cloud.init()
     this.getUserInfo()
     this.loadRecentIdentifications()
   }
 
-  getUserInfo(): void {
-    // 获取用户信息
-    Taro.getUserInfo({
-      success: (res) => {
-        this.setState({
-          userInfo: res.userInfo
-        })
-      }
-    })
+  getUserInfo = async (): Promise<void> => {
+    try {
+      const userInfo = await cloud.userAPI.getUserInfo()
+      this.setState({ userInfo })
+    } catch (error) {
+      console.error('获取用户信息失败:', error)
+      // 如果获取失败，使用默认用户信息
+      this.setState({
+        userInfo: {
+          openid: '',
+          nickName: '微信用户',
+          avatarUrl: '',
+          createTime: new Date(),
+          updateTime: new Date()
+        }
+      })
+    }
   }
 
-  loadRecentIdentifications(): void {
-    // 模拟加载最近的识别记录
-    const mockData: IdentificationItem[] = [
-      {
-        id: '1',
-        name: '月季花',
-        scientificName: 'Rosa chinensis',
-        image: 'https://via.placeholder.com/80x80',
-        date: '2024-01-15',
-        accuracy: '95%',
-        isFavorite: false
-      },
-      {
-        id: '2',
-        name: '向日葵',
-        scientificName: 'Helianthus annuus',
-        image: 'https://via.placeholder.com/80x80',
-        date: '2024-01-14',
-        accuracy: '92%',
-        isFavorite: false
-      }
-    ]
-    this.setState({
-      recentIdentifications: mockData
-    })
+  loadRecentIdentifications = async (): Promise<void> => {
+    this.setState({ loading: true })
+    
+    try {
+      // 获取最近的识别记录
+      const recentData = await cloud.plantAPI.getHistory(5, 0, 'all')
+      
+      this.setState({
+        recentIdentifications: recentData,
+        loading: false
+      })
+    } catch (error) {
+      console.error('加载最近识别记录失败:', error)
+      this.setState({ loading: false })
+    }
   }
 
   handleStartIdentify = (): void => {
@@ -86,7 +92,7 @@ export default class Index extends Component<{}, State> {
   }
 
   render(): React.ReactNode {
-    const { userInfo, recentIdentifications } = this.state
+    const { userInfo, recentIdentifications, loading } = this.state
 
     return (
       <View className='index'>
@@ -100,7 +106,7 @@ export default class Index extends Component<{}, State> {
             <View className='user-info'>
               {userInfo ? (
                 <View className='user-avatar'>
-                  <Image src={userInfo.avatarUrl} className='avatar' />
+                  <Image src={userInfo.avatarUrl || 'https://via.placeholder.com/60x60'} className='avatar' />
                   <Text className='username'>{userInfo.nickName}</Text>
                 </View>
               ) : (
@@ -114,16 +120,16 @@ export default class Index extends Component<{}, State> {
 
           {/* 功能区域 */}
           <View className='feature-section'>
-            <AtButton
-              type='primary'
-              size='large'
+            <AtButton 
+              type='primary' 
+              size='normal'
               className='identify-btn'
               onClick={this.handleStartIdentify}
             >
               <AtIcon value='camera' size='20' />
               开始识别
             </AtButton>
-
+            
             <View className='feature-grid'>
               <View className='feature-item' onClick={this.handleStartIdentify}>
                 <AtIcon value='camera' size='30' color='#07c160' />
@@ -150,18 +156,23 @@ export default class Index extends Component<{}, State> {
               <Text className='section-title'>最近识别</Text>
               <Text className='section-more' onClick={this.handleViewHistory}>查看更多</Text>
             </View>
-
-            {recentIdentifications.length > 0 ? (
+            
+            {loading ? (
+              <View className='loading-state'>
+                <AtIcon value='loading' size='30' color='#07c160' />
+                <Text className='loading-text'>加载中...</Text>
+              </View>
+            ) : recentIdentifications.length > 0 ? (
               <View className='recent-list'>
                 {recentIdentifications.map(item => (
                   <AtCard
-                    key={item.id}
+                    key={item._id}
                     className='recent-item'
                     title={item.name}
                     extra={`准确率: ${item.accuracy}`}
                   >
                     <View className='recent-content'>
-                      <Image src={item.image} className='recent-image' />
+                      <Image src={item.image || 'https://via.placeholder.com/80x80'} className='recent-image' />
                       <View className='recent-info'>
                         <Text className='recent-name'>{item.name}</Text>
                         <Text className='recent-date'>{item.date}</Text>
