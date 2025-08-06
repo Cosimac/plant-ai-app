@@ -64,11 +64,11 @@ export default class Index extends Component<{}, State> {
 
   loadRecentIdentifications = async (): Promise<void> => {
     this.setState({ loading: true })
-    
+
     try {
       // 获取最近的识别记录
       // const recentData = await cloud.plantAPI.getHistory(5, 0, 'all')
-      
+
       // this.setState({
       //   recentIdentifications: recentData,
       //   loading: false
@@ -92,60 +92,57 @@ export default class Index extends Component<{}, State> {
   }
 
   render(): React.ReactNode {
-    const { userInfo, recentIdentifications, loading } = this.state
+    const { recentIdentifications, loading } = this.state
 
     return (
       <View className='index'>
         <View className='container'>
-          {/* 欢迎区域 */}
-          <View className='welcome-section'>
-            <View className='welcome-header'>
-              <Text className='welcome-title'>欢迎使用花草识AI</Text>
-              <Text className='welcome-subtitle'>AI智能识别，让植物知识触手可及</Text>
-            </View>
-            <View className='user-info'>
-              {userInfo ? (
-                <View className='user-avatar'>
-                  <Image src={userInfo.avatarUrl || 'https://via.placeholder.com/60x60'} className='avatar' />
-                  <Text className='username'>{userInfo.nickName}</Text>
+          {/* Hero区域 */}
+          <View className='hero-section'>
+            <View className='hero-content'>
+              <View className='hero-decoration'>
+                <Text className='decoration-emoji big'>🌺</Text>
+                <Text className='decoration-emoji small left'>🌿</Text>
+                <Text className='decoration-emoji small right'>🍃</Text>
+              </View>
+              <Text className='hero-title'>发现植物之美</Text>
+              <Text className='hero-subtitle'>AI识别 · 一拍即知 · 学习自然</Text>
+              
+              {/* 主要操作按钮 */}
+              <View className='main-action'>
+                <View className='identify-btn' onClick={this.handleStartIdentify}>
+                  <View className='btn-icon'>📷</View>
+                  <Text className='btn-text'>开始识别</Text>
+                  <View className='btn-shine'></View>
                 </View>
-              ) : (
-                <View className='user-avatar'>
-                  <AtIcon value='user' size='30' color='#07c160' />
-                  <Text className='username'>未登录</Text>
-                </View>
-              )}
+              </View>
             </View>
           </View>
 
-          {/* 功能区域 */}
-          <View className='feature-section'>
-            <AtButton 
-              type='primary' 
-              size='normal'
-              className='identify-btn'
-              onClick={this.handleStartIdentify}
-            >
-              <AtIcon value='camera' size='20' />
-              开始识别
-            </AtButton>
-            
-            <View className='feature-grid'>
-              <View className='feature-item' onClick={this.handleStartIdentify}>
-                <AtIcon value='camera' size='30' color='#07c160' />
-                <Text className='feature-text'>拍照识别</Text>
+          {/* 快捷功能卡片 */}
+          <View className='feature-cards'>
+            <View className='card-row'>
+              <View className='feature-card primary' onClick={this.handleStartIdentify}>
+                <View className='card-icon'>📸</View>
+                <Text className='card-title'>拍照识别</Text>
+                <Text className='card-desc'>对准植物一键识别</Text>
               </View>
-              <View className='feature-item' onClick={this.handleViewHistory}>
-                <AtIcon value='list' size='30' color='#07c160' />
-                <Text className='feature-text'>识别历史</Text>
+              <View className='feature-card secondary' onClick={this.handleViewHistory}>
+                <View className='card-icon'>📚</View>
+                <Text className='card-title'>识别历史</Text>
+                <Text className='card-desc'>查看识别记录</Text>
               </View>
-              <View className='feature-item'>
-                <AtIcon value='star' size='30' color='#07c160' />
-                <Text className='feature-text'>收藏夹</Text>
+            </View>
+            <View className='card-row'>
+              <View className='feature-card tertiary'>
+                <View className='card-icon'>⭐</View>
+                <Text className='card-title'>我的收藏</Text>
+                <Text className='card-desc'>收藏喜欢的植物</Text>
               </View>
-              <View className='feature-item'>
-                <AtIcon value='help' size='30' color='#07c160' />
-                <Text className='feature-text'>使用帮助</Text>
+              <View className='feature-card quaternary'>
+                <View className='card-icon'>🎓</View>
+                <Text className='card-title'>植物百科</Text>
+                <Text className='card-desc'>学习植物知识</Text>
               </View>
             </View>
           </View>
@@ -153,41 +150,58 @@ export default class Index extends Component<{}, State> {
           {/* 最近识别 */}
           <View className='recent-section'>
             <View className='section-header'>
-              <Text className='section-title'>最近识别</Text>
-              <Text className='section-more' onClick={this.handleViewHistory}>查看更多</Text>
+              <View className='header-left'>
+                <Text className='section-emoji'>🕐</Text>
+                <Text className='section-title'>最近识别</Text>
+              </View>
+              <Text className='section-more' onClick={this.handleViewHistory}>查看全部</Text>
             </View>
-            
+
             {loading ? (
               <View className='loading-state'>
-                <AtIcon value='loading' size='30' color='#07c160' />
+                <View className='loading-icon'>🌱</View>
                 <Text className='loading-text'>加载中...</Text>
               </View>
             ) : recentIdentifications.length > 0 ? (
               <View className='recent-list'>
                 {recentIdentifications.map(item => (
-                  <AtCard
-                    key={item._id}
-                    className='recent-item'
-                    title={item.name}
-                    extra={`准确率: ${item.accuracy}`}
-                  >
-                    <View className='recent-content'>
-                      <Image src={item.image || 'https://via.placeholder.com/80x80'} className='recent-image' />
-                      <View className='recent-info'>
-                        <Text className='recent-name'>{item.name}</Text>
-                        <Text className='recent-date'>{item.date}</Text>
-                      </View>
+                  <View key={item._id} className='recent-item'>
+                    <View className='item-image'>
+                      <Image src={item.image || 'https://via.placeholder.com/80x80'} className='plant-image' />
                     </View>
-                  </AtCard>
+                    <View className='item-content'>
+                      <Text className='plant-name'>{item.name}</Text>
+                      <Text className='plant-accuracy'>准确率: {item.accuracy}</Text>
+                      <Text className='plant-date'>{item.date}</Text>
+                    </View>
+                    <View className='item-action'>
+                      <Text className='action-emoji'>➡️</Text>
+                    </View>
+                  </View>
                 ))}
               </View>
             ) : (
               <View className='empty-state'>
-                <AtIcon value='camera' size='50' color='#ccc' />
-                <Text className='empty-text'>暂无识别记录</Text>
-                <Text className='empty-subtext'>开始您的第一次植物识别吧</Text>
+                <View className='empty-illustration'>
+                  <Text className='empty-emoji'>🌱</Text>
+                  <View className='empty-dots'>
+                    <View className='dot'></View>
+                    <View className='dot'></View>
+                    <View className='dot'></View>
+                  </View>
+                </View>
+                <Text className='empty-title'>还没有识别记录</Text>
+                <Text className='empty-subtitle'>快来识别你的第一株植物吧！</Text>
+                <View className='empty-action' onClick={this.handleStartIdentify}>
+                  <Text className='empty-btn-text'>立即开始 🚀</Text>
+                </View>
               </View>
             )}
+          </View>
+
+          {/* 底部装饰 */}
+          <View className='bottom-decoration'>
+            <Text className='decoration-text'>让AI带你走进植物世界 🌍</Text>
           </View>
         </View>
       </View>

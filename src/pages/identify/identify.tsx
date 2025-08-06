@@ -188,8 +188,8 @@ export default class Identify extends Component<{}, State> {
                   }}
                 />
                 <View className='camera-controls'>
-                  <AtButton 
-                    circle 
+                  <AtButton
+                    circle
                     size='normal'
                     className='capture-btn'
                     onClick={this.takePhoto}
@@ -197,8 +197,8 @@ export default class Identify extends Component<{}, State> {
                   >
                     <AtIcon value='camera' size='30' color='white' />
                   </AtButton>
-                  <AtButton 
-                    circle 
+                  <AtButton
+                    circle
                     size='small'
                     className='switch-btn'
                     onClick={this.handleSwitchCamera}
@@ -218,8 +218,8 @@ export default class Identify extends Component<{}, State> {
           {/* 操作按钮 */}
           <View className='action-section'>
             <View className='action-buttons'>
-              <AtButton 
-                type='primary' 
+              <AtButton
+                type='primary'
                 size='normal'
                 className='action-btn'
                 onClick={() => this.setState({ showCamera: true })}
@@ -227,9 +227,9 @@ export default class Identify extends Component<{}, State> {
                 <AtIcon value='camera' size='20' />
                 拍照识别
               </AtButton>
-              
-              <AtButton 
-                type='secondary' 
+
+              <AtButton
+                type='secondary'
                 size='normal'
                 className='action-btn'
                 onClick={this.handleChooseImage}
@@ -268,12 +268,12 @@ export default class Identify extends Component<{}, State> {
                     <Text className='scientific-name'>{result.scientificName}</Text>
                     <Text className='accuracy'>准确率: {result.accuracy}</Text>
                   </View>
-                  
+
                   <View className='result-section'>
                     <Text className='section-title'>植物描述</Text>
                     <Text className='description'>{result.description}</Text>
                   </View>
-                  
+
                   <View className='result-section'>
                     <Text className='section-title'>主要特征</Text>
                     <View className='characteristics'>
@@ -282,7 +282,7 @@ export default class Identify extends Component<{}, State> {
                       ))}
                     </View>
                   </View>
-                  
+
                   <View className='result-section'>
                     <Text className='section-title'>养护建议</Text>
                     <View className='care-tips'>
