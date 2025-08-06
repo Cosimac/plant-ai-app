@@ -11,7 +11,7 @@ const BAIDU_SECRET_KEY = 'mu2ROERA3DPMhIIOpl7vqOxVeIEkGSMm' // 请替换为你�
 const BAIDU_PLANT_API_URL = 'https://aip.baidubce.com/rest/2.0/image-classify/v1/plant'
 
 // 获取百度AI访问令牌
-async function getBaiduAccessToken() {
+async function getBaiduAccessToken () {
   try {
     const response = await axios.get(
       `https://aip.baidubce.com/oauth/2.0/token?grant_type=client_credentials&client_id=${BAIDU_API_KEY}&client_secret=${BAIDU_SECRET_KEY}`
@@ -23,38 +23,70 @@ async function getBaiduAccessToken() {
   }
 }
 
-// 植物识别
-async function identifyPlant(imageUrl) {
+// 获取图片的base64编码
+async function getImageBase64 (imageUrl) {
   try {
+    let imageBuffer;
+
+    // 检查是否是云存储路径
+    if (imageUrl.startsWith('cloud://')) {
+      console.log('检测到云存储路径，使用云开发API下载文件')
+      // 使用云开发API下载文件
+      const result = await cloud.downloadFile({
+        fileID: imageUrl
+      })
+      imageBuffer = result.fileContent
+    } else if (imageUrl.startsWith('https://') || imageUrl.startsWith('http://')) {
+      console.log('检测到HTTP URL，使用axios下载文件')
+      // 普通HTTP URL，使用axios下载
+      const imageResponse = await axios.get(imageUrl, {
+        responseType: 'arraybuffer'
+      })
+      imageBuffer = imageResponse.data
+    } else {
+      throw new Error('不支持的图片URL格式')
+    }
+
+    // 转换为base64
+    const base64Image = Buffer.from(imageBuffer).toString('base64')
+    return base64Image
+  } catch (error) {
+    console.error('获取图片失败:', error)
+    throw new Error(`图片获取失败: ${error.message}`)
+  }
+}
+
+// 植物识别
+async function identifyPlant (imageUrl) {
+  try {
+    console.log('开始植物识别，图片URL:', imageUrl)
+
     // 获取访问令牌
     const accessToken = await getBaiduAccessToken()
-    
-    // 下载图片并转换为base64
-    const imageResponse = await axios.get(imageUrl, {
-      responseType: 'arraybuffer'
-    })
-    const base64Image = Buffer.from(imageResponse.data, 'binary').toString('base64')
-    
+    console.log('成功获取百度访问令牌')
+
+    // 获取图片并转换为base64
+    const base64Image = await getImageBase64(imageUrl)
+    console.log('成功获取图片base64编码')
+
     // 调用百度植物识别API
     const response = await axios.post(
       `${BAIDU_PLANT_API_URL}?access_token=${accessToken}`,
-      {
-        image: base64Image,
-        baike_num: 1 // 返回百科信息数量
-      },
+      `image=${encodeURIComponent(base64Image)}&baike_num=1`,
       {
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded'
         }
       }
     )
-    
+
     const result = response.data
-    
+    console.log('百度API响应:', result)
+
     if (result.error_code) {
       throw new Error(`百度API错误: ${result.error_msg}`)
     }
-    
+
     // 处理识别结果
     const plants = result.result || []
     if (plants.length === 0) {
@@ -63,10 +95,10 @@ async function identifyPlant(imageUrl) {
         message: '未能识别出植物，请尝试拍摄更清晰的图片'
       }
     }
-    
+
     const bestMatch = plants[0]
     const accuracy = Math.round(bestMatch.score * 100)
-    
+
     return {
       success: true,
       data: {
@@ -101,16 +133,19 @@ async function identifyPlant(imageUrl) {
 // 云函数入口函数
 exports.main = async (event, context) => {
   const { imageUrl } = event
-  
+
+  console.log('云函数被调用，参数:', { imageUrl })
+
   if (!imageUrl) {
     return {
       success: false,
       message: '缺少图片URL参数'
     }
   }
-  
+
   try {
     const result = await identifyPlant(imageUrl)
+    console.log('识别结果:', result)
     return result
   } catch (error) {
     console.error('云函数执行失败:', error)
