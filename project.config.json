@@ -2,7 +2,8 @@
   "miniprogramRoot": "./dist",
   "projectname": "花草识AI",
   "description": "基于Taro的植物识别AI小程序",
-  "appid": "your-app-id-here",
+  "appid": "wx98fef2a779d25d99",
+  "cloudfunctionRoot": "cloudfunctions",
   "setting": {
     "urlCheck": true,
     "es6": false,
@@ -23,4 +24,4 @@
     "tabIndent": "insertSpaces",
     "tabSize": 2
   }
-} 
+}

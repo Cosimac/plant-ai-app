@@ -45,8 +45,8 @@ export default class Index extends Component<{}, State> {
 
   getUserInfo = async (): Promise<void> => {
     try {
-      const userInfo = await cloud.userAPI.getUserInfo()
-      this.setState({ userInfo })
+      // const userInfo = await cloud.userAPI.getUserInfo()
+      // this.setState({ userInfo })
     } catch (error) {
       console.error('获取用户信息失败:', error)
       // 如果获取失败，使用默认用户信息
@@ -67,12 +67,12 @@ export default class Index extends Component<{}, State> {
     
     try {
       // 获取最近的识别记录
-      const recentData = await cloud.plantAPI.getHistory(5, 0, 'all')
+      // const recentData = await cloud.plantAPI.getHistory(5, 0, 'all')
       
-      this.setState({
-        recentIdentifications: recentData,
-        loading: false
-      })
+      // this.setState({
+      //   recentIdentifications: recentData,
+      //   loading: false
+      // })
     } catch (error) {
       console.error('加载最近识别记录失败:', error)
       this.setState({ loading: false })
