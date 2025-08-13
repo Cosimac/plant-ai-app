@@ -3,6 +3,37 @@
   background: #f8f8f8;
 }
 
+.top-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px;
+  background: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.back-btn {
+  background: #f0f0f0;
+  border: none;
+  
+  &:active {
+    transform: scale(0.95);
+  }
+}
+
+.page-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+}
+
+.nav-placeholder {
+  width: 40px;
+}
+
 .camera-section {
   background: #000;
   position: relative;

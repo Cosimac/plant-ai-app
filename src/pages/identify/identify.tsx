@@ -171,6 +171,20 @@ export default class Identify extends Component<{}, State> {
     return (
       <View className='identify'>
         <View className='container'>
+          {/* 顶部导航 */}
+          <View className='top-nav'>
+            <AtButton
+              circle
+              size='small'
+              className='back-btn'
+              onClick={() => Taro.navigateTo({ url: '/pages/index/index' })}
+            >
+              <AtIcon value='chevron-left' size='20' />
+            </AtButton>
+            <Text className='page-title'>植物识别</Text>
+            <View className='nav-placeholder'></View>
+          </View>
+
           {/* 相机区域 */}
           <View className='camera-section'>
             {showCamera ? (

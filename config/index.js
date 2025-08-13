@@ -1,8 +1,9 @@
 const config = {
   projectName: 'plant-ai-app',
   date: '2024-1-1',
-  designWidth: 750,
+  designWidth: 375,
   deviceRatio: {
+    375: 2,
     640: 2.34 / 2,
     750: 1,
     828: 1.81 / 2
@@ -26,45 +27,14 @@ const config = {
   mini: {
     postcss: {
       pxtransform: {
-        enable: true,
-        config: {
-
-        }
-      },
-      url: {
-        enable: true,
-        config: {
-          limit: 1024
-        }
-      },
-      cssModules: {
-        enable: false,
-        config: {
-          namingPattern: 'module',
-          generateScopedName: '[name]__[local]___[hash:base64:5]'
-        }
+        enable: false
       }
     }
   },
   h5: {
     publicPath: '/',
-    staticDirectory: 'static',
-    postcss: {
-      autoprefixer: {
-        enable: true,
-        config: {
-        }
-      },
-      cssModules: {
-        enable: false,
-        config: {
-          namingPattern: 'module',
-          generateScopedName: '[name]__[local]___[hash:base64:5]'
-        }
-      }
-    }
+    staticDirectory: 'static'
   },
-  // TypeScript 配置
   typescript: {
     enableTypeChecking: true
   }
