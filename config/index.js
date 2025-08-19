@@ -1,12 +1,13 @@
+const path = require('path')
 const config = {
   projectName: 'plant-ai-app',
   date: '2024-1-1',
-  designWidth: 375,
+  designWidth: 750,
   deviceRatio: {
-    375: 2,
     640: 2.34 / 2,
     750: 1,
-    828: 1.81 / 2
+    828: 1.81 / 2,
+    375: 2 / 1
   },
   sourceRoot: 'src',
   outputRoot: 'dist',
@@ -27,7 +28,12 @@ const config = {
   mini: {
     postcss: {
       pxtransform: {
-        enable: false
+        enable: true,        // 启用px自动转换
+        config: {
+          selectorBlackList: ['.ignore', '.hairlines'], // 不转换的类名
+          mediaQuery: false,  // 是否转换媒体查询中的px
+          minPixelValue: 1    // 最小转换数值
+        }
       }
     }
   },
@@ -37,6 +43,9 @@ const config = {
   },
   typescript: {
     enableTypeChecking: true
+  },
+  alias: {
+    '@': path.resolve(__dirname, '..', 'src')
   }
 }
 

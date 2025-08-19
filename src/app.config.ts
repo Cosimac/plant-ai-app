@@ -14,11 +14,11 @@ interface AppConfig {
 }
 
 const config: AppConfig = {
-  pages: ['pages/index/index', 'pages/identify/identify'],
+  pages: ['pages/index/index'],
   window: {
     backgroundTextStyle: 'light',
-    navigationBarBackgroundColor: '#4CAF50',
-    navigationBarTitleText: '小植识',
+    navigationBarBackgroundColor: '#000',
+    navigationBarTitleText: '花草识',
     navigationBarTextStyle: 'white',
     navigationStyle: 'custom',
     backgroundColor: '#f5f5f5',
