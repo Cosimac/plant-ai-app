@@ -19,7 +19,7 @@ const config: AppConfig = {
     backgroundTextStyle: 'light',
     navigationBarBackgroundColor: '#000',
     navigationBarTitleText: '花草识',
-    navigationBarTextStyle: 'white',
+    navigationBarTextStyle: 'black',
     navigationStyle: 'custom',
     backgroundColor: '#f5f5f5',
     // enablePullDownRefresh: true,

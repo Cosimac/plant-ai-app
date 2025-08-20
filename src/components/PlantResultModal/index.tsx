@@ -1,5 +1,5 @@
-import { View, Text } from '@tarojs/components'
-import { AtModal, AtModalHeader, AtModalContent, AtModalAction, AtButton } from 'taro-ui'
+import { View, Text, Image } from '@tarojs/components'
+import { AtModal, AtModalContent, AtModalAction, AtButton, AtRate, AtIcon } from 'taro-ui'
 import React from 'react'
 import './index.scss'
 
@@ -24,41 +24,58 @@ interface PlantResultModalProps {
 
 const PlantResultModal: React.FC<PlantResultModalProps> = ({ isOpened, result, onClose, onSave }) => {
   console.log('result :', result);
+  const { name, scientificName, careTips, baikeInfo, allResults } = result || {};
+  const getRateValue = (score: any): number => {
+    const numericScore = Number(score);
+    if (Number.isNaN(numericScore)) return 0;
+    const normalized = numericScore > 1 ? numericScore / 20 : numericScore * 5;
+    const clamped = Math.max(0, Math.min(5, normalized));
+    return Math.round(clamped);
+  };
   return <AtModal isOpened={isOpened} onClose={onClose} className='plant-result-modal'>
-    <AtModalHeader>识别结果</AtModalHeader>
     <AtModalContent>
       {result && (
         <View className='result-content'>
           <View className='result-header'>
-            <Text className='plant-name'>{result.name}</Text>
-            <Text className='scientific-name'>{result.scientificName}</Text>
-            <Text className='accuracy'>准确率: {result.accuracy}</Text>
+            <Text className='plant-name'>{name}</Text>
+            {baikeInfo?.image_url && <View className='avatar-wrap'>
+              <Image src={baikeInfo?.image_url} className='plant-image' mode='aspectFill' />
+            </View>}
+            <Text className='scientific-name'>{scientificName}</Text>
           </View>
-          <View className='result-section'>
-            <Text className='section-title'>植物描述</Text>
-            <Text className='description'>{result.description}</Text>
-          </View>
-          <View className='result-section'>
-            <Text className='section-title'>主要特征</Text>
-            <View className='characteristics'>
-              {result.characteristics.map((item, index) => (
-                <Text key={index} className='characteristic-item'>• {item}</Text>
+          {name !== '非植物' && <View className='result-section'>
+            <Text className='section-title'>相似植物 (匹配度)</Text>
+            <View className='care-tips'>
+              {allResults?.map((item: any, index: number) => (
+                <View key={index} className='similar-item'>
+                  <Text className='care-item-name'>{item.name}</Text>
+                  <View className='care-item-rate'>
+                    <AtRate size={14} value={getRateValue(item.score)} />
+                  </View>
+                </View>
               ))}
             </View>
-          </View>
+          </View>}
           <View className='result-section'>
-            <Text className='section-title'>养护建议</Text>
+            <Text className='section-title'>温馨提示</Text>
             <View className='care-tips'>
-              {result.careTips.map((item, index) => (
-                <Text key={index} className='care-tip-item'>• {item}</Text>
+              {careTips?.map((item: string, index: number) => (
+                <Text key={index} className='similar-item'>
+                  <Text className='care-item-name'>{item}</Text>
+                  <View className='care-item-rate'>
+                    <AtRate size={14} value={getRateValue(item.score)} />
+                  </View>
+                </Text>
               ))}
             </View>
           </View>
         </View>
       )}
     </AtModalContent>
+    <View className='modal-close' onClick={onClose} role='button' aria-label='关闭'>
+      <AtIcon value='close' size={16} color='#2e7d32' />
+    </View>
     <AtModalAction>
-      <AtButton onClick={onClose}>关闭</AtButton>
       {onSave && <AtButton onClick={onSave}>保存</AtButton>}
     </AtModalAction>
   </AtModal>
