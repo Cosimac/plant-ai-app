@@ -108,11 +108,6 @@ export default class Index extends Component<{}, State> {
         <View className='feature-bar'>
           <Image src={LogoSvg} className='feature-logo' mode='aspectFit' />
           <Text className='feature-title'>花草识</Text>
-          <View className='feature-divider'></View>
-          <View className='feature-history' onClick={this.handleCategory}>
-            <Image src={GiftSvg} className='feature-history-icon' mode='aspectFit' />
-            <Text className='feature-history-text'>历史</Text>
-          </View>
         </View>
         {/* 主内容区域 */}
         <View className='main-content'>
@@ -128,7 +123,7 @@ export default class Index extends Component<{}, State> {
             />
             {/* 提示文字 */}
             <View className='instruction-text'>
-              <Text>点击底部按钮拍植物~</Text>
+              <Text>点击按钮识别植物~</Text>
             </View>
           </View>
         </View>
