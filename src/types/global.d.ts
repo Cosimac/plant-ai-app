@@ -108,6 +108,20 @@ declare module '@tarojs/taro' {
     showModal(options: ShowModalOptions): void;
     navigateTo(options: NavigateToOptions): void;
     switchTab(options: SwitchTabOptions): void;
+    createSelectorQuery(): {
+      select(selector: string): {
+        node(callback?: (res: { node?: any }) => void): {
+          exec(): void;
+        };
+      };
+    };
+    getSystemInfoSync(): {
+      windowWidth: number;
+      windowHeight: number;
+      pixelRatio: number;
+    };
+    showLoading(options: { title: string; mask?: boolean }): void;
+    hideLoading(): void;
   };
 
   export default Taro;
@@ -147,4 +161,9 @@ declare module '*.gif' {
 declare module '*.svg' {
   const content: string;
   export default content;
+}
+
+declare module '*.json' {
+  const value: any;
+  export default value;
 } 

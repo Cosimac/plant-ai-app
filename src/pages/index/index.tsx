@@ -4,12 +4,14 @@ import { AtButton, AtIcon } from 'taro-ui'
 import Taro from '@tarojs/taro'
 import cloud from '@/utils/cloud'
 import './index.scss'
-import LeafSvg from '@/assets/leaf.svg'
-import LogoSvg from '@/assets/logo.svg'
-import GiftSvg from '@/assets/gift.svg'
+
+import LogoSvg from '@/assets/icons/logo.svg'
+import GiftSvg from '@/assets/icons/gift.svg'
 import SafeAreaTop from '@/components/SafeAreaTop'
 import SafeAreaBottom from '@/components/SafeAreaBottom'
 import PlantResultModal, { PlantResult } from '@/components/PlantResultModal'
+import LottiePlayer from '@/components/LottiePlayer'
+import plantAnimation from '@/assets/lottie/plant.json'
 
 interface State {
   loading: boolean;
@@ -115,11 +117,15 @@ export default class Index extends Component<{}, State> {
         {/* 主内容区域 */}
         <View className='main-content'>
           <View className='content-card'>
-            {/* 装饰性叶子图片 */}
-            <View className='leaf-decoration'>
-              <Image src={LeafSvg} className='leaf-image large' mode='aspectFit' />
-              <Image src={LeafSvg} className='leaf-image small' mode='aspectFit' />
-            </View>
+            {/* Lottie 动画 */}
+            <LottiePlayer
+              animationData={plantAnimation}
+              width={240}
+              height={240}
+              loop={true}
+              autoplay={true}
+              className='plant-animation'
+            />
             {/* 提示文字 */}
             <View className='instruction-text'>
               <Text>点击底部按钮拍植物~</Text>

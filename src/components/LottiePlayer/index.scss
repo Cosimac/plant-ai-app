@@ -1,0 +1,61 @@
+.lottie-player {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.lottie-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.lottie-canvas {
+  border-radius: 12px;
+}
+
+/* 加载状态 */
+.lottie-loading {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(245, 245, 245, 0.8);
+  border-radius: 12px;
+  z-index: 1;
+}
+
+.loading-text {
+  font-size: 14px;
+  color: #666;
+  font-weight: 500;
+}
+
+/* 错误状态 */
+.lottie-error {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 245, 245, 0.9);
+  border-radius: 12px;
+  border: 1px solid #ffebee;
+  z-index: 1;
+}
+
+.error-text {
+  font-size: 14px;
+  color: #f56565;
+  font-weight: 500;
+}

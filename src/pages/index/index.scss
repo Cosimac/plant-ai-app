@@ -27,6 +27,13 @@ page {
   overflow: hidden;
 }
 
+/* 植物动画 */
+.plant-animation {
+  margin: 0 auto 20px;
+  z-index: 2;
+  position: relative;
+}
+
 /* 装饰性叶子 */
 .leaf-decoration {
   position: absolute;
@@ -106,7 +113,7 @@ page {
 .bottom-actions {
   width: 100%;
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   justify-content: space-between;
   padding: 0 64px 64px;
   margin: 0 auto;
