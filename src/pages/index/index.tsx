@@ -67,7 +67,6 @@ export default class Index extends Component<{}, State> {
       },
       fail: (error: any) => {
         console.error('拍照失败:', error)
-        Taro.showToast({ title: '拍照失败', icon: 'none' })
       }
     })
   }
@@ -83,7 +82,6 @@ export default class Index extends Component<{}, State> {
       },
       fail: (error: any) => {
         console.error('选择图片失败:', error)
-        Taro.showToast({ title: '选择图片失败', icon: 'none' })
       }
     })
   }
