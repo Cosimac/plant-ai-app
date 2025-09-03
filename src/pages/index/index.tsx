@@ -5,6 +5,9 @@ import Taro from '@tarojs/taro'
 import cloud from '@/utils/cloud'
 import './index.scss'
 
+// 声明全局 wx 对象
+declare const wx: any
+
 import LogoSvg from '@/assets/icons/logo.svg'
 
 import SafeAreaTop from '@/components/SafeAreaTop'
@@ -38,12 +41,9 @@ export default class Index extends Component<{}, State> {
         title: '识别中...',
       })
       
-      // 上传图片到云存储
-      const uploadResult = await cloud.uploadFile(
-        imagePath,
-        `plants/${Date.now()}_${Math.random().toString(36).substr(2, 9)}.jpg`
-      )
-      const plantResult = await cloud.plantAPI.identifyPlant(uploadResult.fileID)
+      // 将图片转换为base64，直接传递给云函数
+      const base64Image = await this.convertImageToBase64(imagePath)
+      const plantResult = await cloud.plantAPI.identifyPlant(base64Image)
       
       this.setState({
         result: plantResult,
@@ -55,6 +55,23 @@ export default class Index extends Component<{}, State> {
       Taro.hideLoading()
       Taro.showToast({ title: error.message || '识别失败', icon: 'none' })
     }
+  }
+
+  // 将图片转换为base64
+  convertImageToBase64 = (imagePath: string): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const fs = wx.getFileSystemManager()
+      fs.readFile({
+        filePath: imagePath,
+        encoding: 'base64',
+        success: (res: any) => {
+          resolve(res.data)
+        },
+        fail: (error: any) => {
+          reject(error)
+        }
+      })
+    })
   }
 
 

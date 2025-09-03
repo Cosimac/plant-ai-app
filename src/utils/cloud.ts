@@ -52,27 +52,13 @@ const cloud = {
     }
   },
 
-  // 上传文件
-  async uploadFile(filePath: string, cloudPath: string): Promise<any> {
-    try {
-      const result = await wx.cloud.uploadFile({
-        cloudPath,
-        filePath,
-      })
-      return result
-    } catch (error) {
-      console.error('上传文件失败:', error)
-      throw error
-    }
-  },
-
   // 植物识别相关API
   plantAPI: {
     // 识别植物
     async identifyPlant(imageData: string): Promise<PlantResult> {
       try {
         const result = await cloud.callFunction('identifyPlant', {
-          imageUrl: imageData,
+          imageData,
         })
         if (!result.success) {
           throw new Error(result.message || '识别失败')
