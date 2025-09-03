@@ -1,17 +1,7 @@
-import Taro from '@tarojs/taro'
-
 // 声明全局 wx 对象
 declare const wx: any
 
 // 类型定义
-interface UserInfo {
-  openid: string
-  nickName: string
-  avatarUrl: string
-  createTime: Date
-  updateTime: Date
-}
-
 interface PlantResult {
   name: string
   scientificName: string
@@ -24,29 +14,10 @@ interface PlantResult {
   allResults?: any[]
 }
 
-interface IdentificationRecord {
-  _id: string
-  openid: string
-  name: string
-  scientificName: string
-  image: string
-  date: string
-  accuracy: string
-  isFavorite: boolean
-  result: PlantResult
-  createTime: Date
-  updateTime: Date
-}
-
 interface CloudFunctionResult<T = any> {
   success: boolean
   data?: T
   message?: string
-}
-
-interface DatabaseResult {
-  _id: string
-  errMsg: string
 }
 
 // 腾讯云开发配置
@@ -95,20 +66,14 @@ const cloud = {
     }
   },
 
-  // 获取数据库引用
-  database() {
-    return wx.cloud.database()
-  },
-
   // 植物识别相关API
   plantAPI: {
     // 识别植物
-    async identifyPlant(imageUrl: string): Promise<PlantResult> {
+    async identifyPlant(imageData: string): Promise<PlantResult> {
       try {
         const result = await cloud.callFunction('identifyPlant', {
-          imageUrl,
+          imageUrl: imageData,
         })
-        console.log('result :', result)
         if (!result.success) {
           throw new Error(result.message || '识别失败')
         }
@@ -118,127 +83,8 @@ const cloud = {
         console.error('植物识别失败:', error)
         throw error
       }
-    },
-
-    // 保存识别记录
-    async saveRecord(
-      record: Partial<IdentificationRecord>
-    ): Promise<DatabaseResult> {
-      try {
-        const result = await cloud.callFunction('saveRecord', {
-          record,
-        })
-
-        if (!result.success) {
-          throw new Error(result.message || '保存失败')
-        }
-
-        return result.data
-      } catch (error) {
-        console.error('保存记录失败:', error)
-        throw error
-      }
-    },
-
-    // 获取识别历史
-    async getHistory(
-      limit: number = 20,
-      offset: number = 0,
-      type: 'all' | 'favorites' = 'all'
-    ): Promise<IdentificationRecord[]> {
-      try {
-        const result = await cloud.callFunction('getHistory', {
-          limit,
-          offset,
-          type,
-        })
-
-        if (!result.success) {
-          throw new Error(result.message || '获取历史记录失败')
-        }
-
-        return result.data
-      } catch (error) {
-        console.error('获取历史记录失败:', error)
-        throw error
-      }
-    },
-
-    // 更新收藏状态
-    async updateFavorite(id: string, isFavorite: boolean): Promise<any> {
-      try {
-        const result = await cloud.callFunction('updateFavorite', {
-          id,
-          isFavorite,
-        })
-
-        if (!result.success) {
-          throw new Error(result.message || '更新收藏状态失败')
-        }
-
-        return result.data
-      } catch (error) {
-        console.error('更新收藏状态失败:', error)
-        throw error
-      }
-    },
-
-    // 删除记录
-    async deleteRecord(id: string): Promise<any> {
-      try {
-        const result = await cloud.callFunction('deleteRecord', {
-          id,
-        })
-
-        if (!result.success) {
-          throw new Error(result.message || '删除记录失败')
-        }
-
-        return result.data
-      } catch (error) {
-        console.error('删除记录失败:', error)
-        throw error
-      }
-    },
-  },
-
-  // 用户相关API
-  userAPI: {
-    // 获取用户信息
-    async getUserInfo(): Promise<UserInfo> {
-      try {
-        const result = await cloud.callFunction('getUserInfo')
-        console.log('result :', result)
-
-        if (!result.success) {
-          throw new Error(result.message || '获取用户信息失败')
-        }
-
-        return result.data
-      } catch (error) {
-        console.error('获取用户信息失败:', error)
-        throw error
-      }
-    },
-
-    // 更新用户信息
-    async updateUserInfo(userInfo: Partial<UserInfo>): Promise<DatabaseResult> {
-      try {
-        const db = cloud.database()
-        const result = await db.collection('users').add({
-          data: {
-            ...userInfo,
-            createTime: new Date(),
-            updateTime: new Date(),
-          },
-        })
-        return result
-      } catch (error) {
-        console.error('更新用户信息失败:', error)
-        throw error
-      }
-    },
-  },
+    }
+  }
 }
 
 export default cloud

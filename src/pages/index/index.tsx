@@ -6,7 +6,7 @@ import cloud from '@/utils/cloud'
 import './index.scss'
 
 import LogoSvg from '@/assets/icons/logo.svg'
-import GiftSvg from '@/assets/icons/gift.svg'
+
 import SafeAreaTop from '@/components/SafeAreaTop'
 import SafeAreaBottom from '@/components/SafeAreaBottom'
 import PlantResultModal, { PlantResult } from '@/components/PlantResultModal'
@@ -37,13 +37,14 @@ export default class Index extends Component<{}, State> {
       Taro.showLoading({
         title: '识别中...',
       })
+      
       // 上传图片到云存储
       const uploadResult = await cloud.uploadFile(
         imagePath,
         `plants/${Date.now()}_${Math.random().toString(36).substr(2, 9)}.jpg`
       )
-      // 调用百度植物识别API
       const plantResult = await cloud.plantAPI.identifyPlant(uploadResult.fileID)
+      
       this.setState({
         result: plantResult,
         showResult: true
@@ -55,6 +56,8 @@ export default class Index extends Component<{}, State> {
       Taro.showToast({ title: error.message || '识别失败', icon: 'none' })
     }
   }
+
+
 
   // 拍照识别
   handleCameraIdentify = (): void => {
