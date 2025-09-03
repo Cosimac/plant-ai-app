@@ -28,26 +28,11 @@ async function getImageBase64 (imageData) {
   try {
     let base64Image;
 
-    // 检查是否是云存储路径
-    if (imageData.startsWith('cloud://')) {
-      // 使用云开发API下载文件
-      const result = await cloud.downloadFile({
-        fileID: imageData
-      })
-      base64Image = Buffer.from(result.fileContent).toString('base64')
-    } else if (imageData.startsWith('https://') || imageData.startsWith('http://')) {
-      // 普通HTTP URL，使用axios下载
-      const imageResponse = await axios.get(imageData, {
-        responseType: 'arraybuffer'
-      })
-      base64Image = Buffer.from(imageResponse.data).toString('base64')
+    // 直接使用base64数据
+    if (imageData.startsWith('data:image/')) {
+      base64Image = imageData.split(',')[1]
     } else {
-      // 直接使用base64数据
-      if (imageData.startsWith('data:image/')) {
-        base64Image = imageData.split(',')[1]
-      } else {
-        base64Image = imageData
-      }
+      base64Image = imageData
     }
 
     return base64Image
