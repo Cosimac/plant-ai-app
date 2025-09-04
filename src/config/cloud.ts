@@ -6,12 +6,11 @@ let cloudConfig: any = null
 
 try {
   // 尝试导入本地配置文件（如果存在）
-  // 使用动态导入来处理TypeScript文件
   const cloudLocalModule = require('./cloud.local.js')
   cloudConfig = cloudLocalModule.CLOUD_CONFIG
 } catch (error) {
   // 如果本地配置文件不存在，使用默认配置
-  console.warn('未找到 cloud.local.js 配置文件，请创建该文件并配置你的云环境ID')
+  console.warn('未找到 cloud.local.js 配置文件，使用默认配置。请创建该文件并配置你的云环境ID')
 }
 
 export const CLOUD_CONFIG = {
