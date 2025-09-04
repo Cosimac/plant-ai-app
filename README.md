@@ -27,6 +27,43 @@ src/
 
 - Node.js >= 14
 - 微信开发者工具
+- 百度AI开放平台账号（用于植物识别API）
+
+### 环境配置
+
+1. **配置云开发环境ID**
+   编辑 `src/config/cloud.local.js` 文件：
+   ```javascript
+   module.exports = {
+     CLOUD_CONFIG: {
+       ENV_ID: 'your_cloud_env_id_here' // 替换为你的真实云环境ID
+     }
+   }
+   ```
+
+2. **配置微信小程序AppID**
+   编辑 `project.config.local.json` 文件：
+   ```json
+   {
+     "appid": "your_wechat_appid_here"
+   }
+   ```
+
+3. **获取百度AI API密钥**
+   - 访问 [百度AI开放平台](https://ai.baidu.com/)
+   - 创建应用并获取 API Key 和 Secret Key
+   - 确保开通植物识别服务
+
+4. **配置微信小程序**
+   - 在微信公众平台创建小程序
+   - 获取 AppID
+   - 开通云开发服务，获取环境ID
+
+5. **配置云函数环境变量**
+   - 在微信开发者工具中打开云开发控制台
+   - 在云函数 `identifyPlant` 中设置环境变量：
+     - `BAIDU_API_KEY`: 你的百度API Key
+     - `BAIDU_SECRET_KEY`: 你的百度Secret Key
 
 ### 安装依赖
 
@@ -45,6 +82,12 @@ npm run dev:weapp
 ```bash
 npm run build:weapp
 ```
+
+### 部署云函数
+
+1. 在微信开发者工具中右键点击 `cloudfunctions/identifyPlant`
+2. 选择"上传并部署：云端安装依赖"
+3. 确保云函数部署成功
 
 ## 📱 页面说明
 
@@ -95,4 +138,28 @@ npm run build:weapp
 
 ## �� 许可证
 
-MIT License 
+MIT License
+
+## 🔒 安全说明
+
+### 敏感信息处理
+
+本项目已移除所有硬编码的敏感信息，包括：
+- 百度AI API密钥
+- 微信小程序AppID
+- 云开发环境ID
+
+### 配置管理
+
+- 云开发环境ID在 `src/config/cloud.local.js` 中配置（本地文件，不提交到版本控制）
+- 微信小程序AppID在 `project.config.local.json` 中配置（本地文件，不提交到版本控制）
+- 百度AI密钥在云函数环境变量中管理
+- 所有敏感信息都已从代码中移除
+- 使用配置模板文件确保安全
+
+### 部署注意事项
+
+1. **生产环境**：确保在云函数中正确设置环境变量
+2. **开发环境**：修改配置文件中的占位符为真实值
+3. **版本控制**：永远不要提交包含真实密钥的配置文件
+4. **配置安全**：所有敏感配置文件都已加入 `.gitignore` 

@@ -1,6 +1,9 @@
 // 声明全局 wx 对象
 declare const wx: any
 
+// 导入云开发配置
+import { CLOUD_CONFIG } from '../config/cloud'
+
 // 类型定义
 interface PlantResult {
   name: string
@@ -23,7 +26,7 @@ interface CloudFunctionResult<T = any> {
 // 腾讯云开发配置
 const cloud = {
   // 云开发环境ID
-  envId: 'cloud1-7gkups8e633f1074',
+  envId: CLOUD_CONFIG.ENV_ID,
 
   // 初始化云开发
   init() {

@@ -6,8 +6,8 @@ cloud.init({
 })
 
 // 百度AI配置
-const BAIDU_API_KEY = 'Dt6l1NcsT8Djr8q5RUnMU7U4' // 请替换为你的百度API Key
-const BAIDU_SECRET_KEY = 'mu2ROERA3DPMhIIOpl7vqOxVeIEkGSMm' // 请替换为你的百度Secret Key
+const BAIDU_API_KEY = process.env.BAIDU_API_KEY || 'your_baidu_api_key_here'
+const BAIDU_SECRET_KEY = process.env.BAIDU_SECRET_KEY || 'your_baidu_secret_key_here'
 const BAIDU_PLANT_API_URL = 'https://aip.baidubce.com/rest/2.0/image-classify/v1/plant'
 
 // 获取百度AI访问令牌

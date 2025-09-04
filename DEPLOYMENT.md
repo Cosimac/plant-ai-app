@@ -1,174 +1,137 @@
-# 花草识AI - 部署说明
+# 🚀 部署指南
 
-## 项目概述
+本指南将帮助您安全地部署植物识别小程序项目。
 
-这是一个基于 Taro + React + TypeScript 的微信小程序，集成了百度植物识别API和腾讯云开发。
+## 📋 部署前准备
 
-## 技术栈
+### 1. 获取必要的API密钥
 
-- **前端框架**: Taro 3.6.8 + React 18
-- **开发语言**: TypeScript
-- **UI组件**: Taro UI
-- **后端服务**: 腾讯云开发
-- **AI服务**: 百度植物识别API
-
-## 部署步骤
-
-### 1. 百度AI配置
-
+#### 百度AI开放平台
 1. 访问 [百度AI开放平台](https://ai.baidu.com/)
-2. 注册账号并创建应用
-3. 开通植物识别服务
-4. 获取 API Key 和 Secret Key
+2. 注册并登录账号
+3. 创建新应用
+4. 开通"植物识别"服务
+5. 获取以下信息：
+   - API Key
+   - Secret Key
 
-### 2. 更新百度API配置
+#### 微信小程序
+1. 访问 [微信公众平台](https://mp.weixin.qq.com/)
+2. 注册小程序账号
+3. 获取 AppID
+4. 开通云开发服务
+5. 获取云环境ID
 
-编辑 `cloudfunctions/identifyPlant/index.js` 文件：
+### 2. 配置环境变量
 
-```javascript
-// 百度AI配置
-const BAIDU_API_KEY = 'your_baidu_api_key' // 替换为你的百度API Key
-const BAIDU_SECRET_KEY = 'your_baidu_secret_key' // 替换为你的百度Secret Key
-```
+#### 本地开发环境
+1. 复制环境变量模板：
+   ```bash
+   cp env.example .env
+   ```
 
-### 3. 腾讯云开发配置
+2. 编辑 `.env` 文件，填入真实配置：
+   ```env
+   # 百度AI配置
+   BAIDU_API_KEY=你的百度API_Key
+   BAIDU_SECRET_KEY=你的百度Secret_Key
+   
+   # 微信小程序配置
+   WECHAT_APPID=你的微信小程序AppID
+   
+   # 云开发配置
+   CLOUD_ENV_ID=你的云环境ID
+   ```
 
-1. 访问 [腾讯云开发控制台](https://console.cloud.tencent.com/tcb)
-2. 创建云开发环境
-3. 获取环境ID
+#### 云函数环境变量
+1. 打开微信开发者工具
+2. 进入云开发控制台
+3. 选择云函数 `identifyPlant`
+4. 在"环境变量"中添加：
+   - `BAIDU_API_KEY`: 你的百度API Key
+   - `BAIDU_SECRET_KEY`: 你的百度Secret Key
 
-### 4. 更新云开发环境ID
+## 🔧 部署步骤
 
-编辑 `src/utils/cloud.ts` 文件：
-
-```typescript
-// 云开发环境ID
-envId: 'your_cloud_env_id', // 替换为你的云开发环境ID
-```
-
-### 5. 部署云函数
-
-在项目根目录执行：
-
+### 1. 安装依赖
 ```bash
-# 安装云开发CLI
-npm install -g @cloudbase/cli
-
-# 登录腾讯云
-tcb login
-
-# 部署云函数
-tcb fn deploy identifyPlant
-tcb fn deploy getUserInfo
-tcb fn deploy saveRecord
-tcb fn deploy getHistory
-tcb fn deploy updateFavorite
-tcb fn deploy deleteRecord
-```
-
-### 6. 创建数据库集合
-
-在腾讯云开发控制台创建以下数据库集合：
-
-- `users` - 用户信息
-- `identifications` - 识别记录
-
-### 7. 构建小程序
-
-```bash
-# 安装依赖
 npm install
+```
 
-# 构建微信小程序
+### 2. 构建项目
+```bash
 npm run build:weapp
 ```
 
-### 8. 上传到微信开发者工具
+### 3. 部署云函数
+1. 在微信开发者工具中右键点击 `cloudfunctions/identifyPlant`
+2. 选择"上传并部署：云端安装依赖"
+3. 等待部署完成
 
-1. 打开微信开发者工具
-2. 导入项目（选择 `dist` 目录）
-3. 配置小程序AppID
-4. 上传代码
+### 4. 配置小程序
+1. 在微信开发者工具中打开项目
+2. 修改 `project.config.json` 中的 `appid` 为你的真实AppID
+3. 确保云开发环境ID正确
 
-## 项目结构
+### 5. 测试功能
+1. 在微信开发者工具中预览小程序
+2. 测试植物识别功能
+3. 检查云函数调用是否正常
 
-```
-plant-ai-app/
-├── src/                    # 源代码
-│   ├── pages/             # 页面组件
-│   ├── utils/             # 工具类
-│   ├── config/            # 配置文件
-│   └── types/             # 类型定义
-├── cloudfunctions/        # 云函数
-│   ├── identifyPlant/     # 植物识别云函数
-│   ├── getUserInfo/       # 获取用户信息
-│   ├── saveRecord/        # 保存记录
-│   ├── getHistory/        # 获取历史
-│   ├── updateFavorite/    # 更新收藏
-│   └── deleteRecord/      # 删除记录
-├── config/                # Taro配置
-└── dist/                  # 构建输出
-```
+## 🔒 安全最佳实践
 
-## 功能特性
+### 1. 环境变量管理
+- ✅ 使用环境变量存储敏感信息
+- ✅ 将 `.env` 文件加入 `.gitignore`
+- ✅ 使用 `env.example` 作为配置模板
+- ❌ 不要在代码中硬编码密钥
 
-### 植物识别
-- 拍照识别植物
-- 相册选择图片识别
-- 实时AI识别结果
-- 详细的植物信息展示
+### 2. 版本控制
+- ✅ 提交前检查是否包含敏感信息
+- ✅ 使用 `git status` 确认文件状态
+- ❌ 不要提交包含真实密钥的文件
 
-### 历史记录
-- 查看识别历史
-- 收藏喜欢的植物
-- 搜索历史记录
-- 删除不需要的记录
+### 3. 生产环境
+- ✅ 在云函数中设置环境变量
+- ✅ 定期轮换API密钥
+- ✅ 监控API调用量
+- ❌ 不要在客户端暴露敏感信息
 
-### 用户系统
-- 微信用户信息获取
-- 用户数据云端同步
-- 个性化体验
+## 🐛 常见问题
 
-## API接口
+### Q: 云函数调用失败
+**A:** 检查以下几点：
+1. 云函数是否正确部署
+2. 环境变量是否设置正确
+3. 百度AI API密钥是否有效
+4. 网络连接是否正常
 
-### 百度植物识别API
-- **接口地址**: `https://aip.baidubce.com/rest/2.0/image-classify/v1/plant`
-- **功能**: 识别图片中的植物
-- **返回**: 植物名称、学名、描述、准确率等
+### Q: 植物识别返回错误
+**A:** 可能的原因：
+1. 图片格式不支持
+2. 图片大小超出限制
+3. API调用次数超限
+4. 网络超时
 
-### 云开发API
-- **数据库**: 存储用户信息和识别记录
-- **云存储**: 存储上传的植物图片
-- **云函数**: 处理业务逻辑
+### Q: 小程序无法连接云开发
+**A:** 检查：
+1. 云开发环境ID是否正确
+2. 小程序AppID是否匹配
+3. 云开发服务是否已开通
 
-## 注意事项
+## 📞 技术支持
 
-1. **API密钥安全**: 请妥善保管百度API密钥，不要提交到代码仓库
-2. **云开发配额**: 注意腾讯云开发的免费配额限制
-3. **图片大小**: 建议上传的图片大小不超过2MB
-4. **网络环境**: 确保小程序有稳定的网络连接
+如果遇到部署问题，请：
+1. 查看控制台错误信息
+2. 检查网络连接
+3. 确认API密钥有效性
+4. 参考官方文档
 
-## 开发环境
+## 🔄 更新部署
 
-- Node.js >= 14
-- npm >= 6
-- 微信开发者工具
-- 腾讯云开发环境
-
-## 常见问题
-
-### Q: 百度API调用失败
-A: 检查API密钥是否正确，确认已开通植物识别服务
-
-### Q: 云函数部署失败
-A: 确认已登录腾讯云，检查云开发环境ID是否正确
-
-### Q: 小程序构建失败
-A: 检查TypeScript语法错误，确认所有依赖已安装
-
-## 技术支持
-
-如有问题，请查看：
-- [Taro官方文档](https://docs.taro.zone/)
-- [百度AI开放平台文档](https://ai.baidu.com/ai-doc/)
-- [腾讯云开发文档](https://cloud.tencent.com/document/product/876) 
+当需要更新项目时：
+1. 拉取最新代码
+2. 更新环境变量（如有变化）
+3. 重新构建项目
+4. 重新部署云函数
+5. 测试功能是否正常
