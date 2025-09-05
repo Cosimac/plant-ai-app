@@ -14,18 +14,21 @@ import SafeAreaTop from '@/components/SafeAreaTop'
 import SafeAreaBottom from '@/components/SafeAreaBottom'
 import PlantResultModal, { PlantResult } from '@/components/PlantResultModal'
 import LottiePlayer from '@/components/LottiePlayer'
+import GuideBubble from '@/components/GuideBubble'
 
 interface State {
   loading: boolean;
   showResult: boolean;
   result: PlantResult | null;
+  showGuideBubble: boolean;
 }
 
 export default class Index extends Component<{}, State> {
   state: State = {
     loading: false,
     showResult: false,
-    result: null
+    result: null,
+    showGuideBubble: false
   }
 
   async componentDidMount(): Promise<void> {
@@ -118,10 +121,45 @@ export default class Index extends Component<{}, State> {
 
   handleCloseResult = (): void => {
     this.setState({ showResult: false })
+
+    // 关闭识别结果后，检查是否需要显示收藏引导气泡
+    this.checkShowGuideBubbleAfterIdentify()
+  }
+
+  // 检查是否需要在识别后显示收藏引导气泡
+  checkShowGuideBubbleAfterIdentify = (): void => {
+    const { result } = this.state
+
+    // 只有成功识别到植物（不是"非植物"）才考虑显示气泡
+    if (result && result.name && result.name !== '非植物') {
+      try {
+        const hasSeenGuideBubble = wx.getStorageSync('hasSeenGuideBubble')
+        if (!hasSeenGuideBubble) {
+          // 首次成功识别植物，显示收藏引导气泡
+          console.log('首次成功识别植物，显示收藏引导气泡')
+          this.setState({ showGuideBubble: true })
+        }
+      } catch (error) {
+        console.error('读取本地存储失败:', error)
+        // 出错时也显示气泡，确保用户体验
+        this.setState({ showGuideBubble: true })
+      }
+    }
+  }
+
+  handleCloseGuideBubble = (): void => {
+    this.setState({ showGuideBubble: false })
+
+    // 关闭气泡时，标记已经显示过，下次不再显示
+    try {
+      wx.setStorageSync('hasSeenGuideBubble', true)
+    } catch (error) {
+      console.error('保存本地存储失败:', error)
+    }
   }
 
   render(): React.ReactNode {
-    const { showResult, result } = this.state
+    const { showResult, result, showGuideBubble } = this.state
     return (
       <View className='index'>
         <SafeAreaTop />
@@ -175,6 +213,13 @@ export default class Index extends Component<{}, State> {
         </View>
         {/* 识别结果弹窗 */}
         <PlantResultModal isOpened={showResult} result={result} onClose={this.handleCloseResult} />
+
+        {/* 引导收藏气泡 */}
+        <GuideBubble
+          visible={showGuideBubble}
+          onClose={this.handleCloseGuideBubble}
+          arrow="top"
+        />
       </View>
     )
   }

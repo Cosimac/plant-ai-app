@@ -46,7 +46,7 @@
   z-index: 3;
 }
 .modal-close:active {
-  transform: scale(0.96);
+  transform: translateX(-50%) scale(0.96);
 }
 
 .avatar-wrap {

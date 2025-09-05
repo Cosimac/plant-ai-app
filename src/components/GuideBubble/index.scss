@@ -1,0 +1,95 @@
+.guide-bubble-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 999;
+  pointer-events: auto;
+}
+
+.guide-bubble {
+  position: absolute;
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  pointer-events: auto;
+  transform-origin: center;
+  animation: guideBubbleIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  // 默认位置调整 - 避开右上角菜单
+  top: 176px;
+  right: 100px;
+  transform: none;
+}
+
+.guide-bubble__arrow {
+  position: absolute;
+  top: -32px;
+  right: 20px;
+  animation: arrowBounce 2s infinite;
+  z-index: 1;
+}
+
+.guide-bubble__content {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.guide-bubble__text {
+  font-size: 28px;
+  font-weight: 600;
+  color: #2e7d32;
+  text-align: center;
+  line-height: 1.4;
+  margin-bottom: 12px;
+}
+
+.guide-bubble__image {
+  width: 400px;
+  height: 250px;
+  border-radius: 8px;
+  display: block;
+}
+
+// 进入动画
+@keyframes guideBubbleIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+// 箭头弹跳动画
+@keyframes arrowBounce {
+  0%,
+  20%,
+  50%,
+  80%,
+  100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-8px);
+  }
+  60% {
+    transform: translateY(-4px);
+  }
+}
+
+// 小程序环境适配
+.taro_page {
+  .guide-bubble-overlay {
+    position: fixed;
+    width: 100vw;
+    height: 100vh;
+  }
+}
