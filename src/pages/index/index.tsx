@@ -14,7 +14,6 @@ import SafeAreaTop from '@/components/SafeAreaTop'
 import SafeAreaBottom from '@/components/SafeAreaBottom'
 import PlantResultModal, { PlantResult } from '@/components/PlantResultModal'
 import LottiePlayer from '@/components/LottiePlayer'
-import plantAnimation from '@/assets/lottie/plant.json'
 
 interface State {
   loading: boolean;
@@ -29,9 +28,13 @@ export default class Index extends Component<{}, State> {
     result: null
   }
 
-  componentDidMount(): void {
-    // 初始化云开发
-    cloud.init()
+  async componentDidMount(): Promise<void> {
+    // 初始化EMAS Serverless
+    try {
+      await cloud.init()
+    } catch (error) {
+      console.error('云服务初始化失败:', error)
+    }
   }
 
   identifyPlant = async (imagePath: string): Promise<void> => {
@@ -40,11 +43,11 @@ export default class Index extends Component<{}, State> {
       Taro.showLoading({
         title: '识别中...',
       })
-      
+
       // 将图片转换为base64，直接传递给云函数
       const base64Image = await this.convertImageToBase64(imagePath)
       const plantResult = await cloud.plantAPI.identifyPlant(base64Image)
-      
+
       this.setState({
         result: plantResult,
         showResult: true
@@ -132,7 +135,7 @@ export default class Index extends Component<{}, State> {
           <View className='content-card'>
             {/* Lottie 动画 */}
             <LottiePlayer
-              animationData={plantAnimation}
+              path='https://mp-55d4a02e-2564-489f-a408-ca370fc7efbc.cdn.bspapp.com/plant.json'
               width={240}
               height={240}
               loop={true}

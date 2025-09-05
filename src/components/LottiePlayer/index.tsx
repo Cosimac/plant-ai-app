@@ -6,7 +6,9 @@ import './index.scss'
 
 interface LottiePlayerProps {
   /** 动画数据 */
-  animationData: any
+  animationData?: any
+  /** 动画路径（远程URL） */
+  path?: string
   /** 动画宽度，默认240 */
   width?: number
   /** 动画高度，默认240 */
@@ -60,8 +62,8 @@ export default class LottiePlayer extends Component<LottiePlayerProps, LottiePla
   }
 
   componentDidUpdate(prevProps: LottiePlayerProps): void {
-    // 如果动画数据发生变化，重新初始化
-    if (prevProps.animationData !== this.props.animationData) {
+    // 如果动画数据或路径发生变化，重新初始化
+    if (prevProps.animationData !== this.props.animationData || prevProps.path !== this.props.path) {
       this.destroyAnimation()
       this.setState({ isInitialized: false, hasError: false })
       this.initLottieAnimation()
@@ -81,10 +83,10 @@ export default class LottiePlayer extends Component<LottiePlayerProps, LottiePla
   }
 
   initLottieAnimation = (): void => {
-    const { animationData, width = 240, height = 240, loop = true, autoplay = true, onLoaded, onError } = this.props
+    const { animationData, path, width = 240, height = 240, loop = true, autoplay = true, onLoaded, onError } = this.props
 
-    if (!animationData) {
-      const error = new Error('缺少animationData')
+    if (!animationData && !path) {
+      const error = new Error('缺少animationData或path参数')
       this.setState({ hasError: true })
       onError?.(error)
       return
@@ -113,14 +115,22 @@ export default class LottiePlayer extends Component<LottiePlayerProps, LottiePla
             lottie.setup(canvas)
 
             // 加载动画
-            this.animation = lottie.loadAnimation({
+            const animationConfig: any = {
               loop,
               autoplay,
-              animationData,
               rendererSettings: {
                 context
               }
-            })
+            }
+
+            // 优先使用 path（远程地址），其次使用 animationData
+            if (path) {
+              animationConfig.path = path
+            } else if (animationData) {
+              animationConfig.animationData = animationData
+            }
+
+            this.animation = lottie.loadAnimation(animationConfig)
 
             // 监听动画事件
             if (this.animation) {

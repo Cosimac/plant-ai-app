@@ -1,7 +1,7 @@
 {
   "name": "plant-ai-app",
   "version": "1.0.0",
-  "description": "花草识AI - 基于Taro的微信小程序",
+  "description": "花草识AI - 基于Taro和EMAS Serverless的微信小程序",
   "main": "app.js",
   "scripts": {
     "build:weapp": "taro build --type weapp",
@@ -21,7 +21,9 @@
     "dev:rn": "npm run build:rn -- --watch",
     "dev:qq": "npm run build:qq -- --watch",
     "dev:jd": "npm run build:jd -- --watch",
-    "dev:quickapp": "npm run build:quickapp -- --watch"
+    "dev:quickapp": "npm run build:quickapp -- --watch",
+    "package:function": "./scripts/package-function.sh",
+    "install:emas-functions": "cd emas-functions/identifyPlant && npm install"
   },
   "browserslist": [
     "last 3 versions",
@@ -30,6 +32,7 @@
   ],
   "author": "",
   "dependencies": {
+    "@alicloud/mpserverless-sdk": "^3.1.5",
     "@babel/runtime": "^7.7.0",
     "@tarojs/components": "3.6.8",
     "@tarojs/helper": "3.6.8",

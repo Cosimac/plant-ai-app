@@ -1,165 +1,80 @@
-# 🌱 小植识 - 植物识别小程序
+# 花草识AI - 微信小程序
 
-基于 Taro + React 开发的微信小程序，使用 AI 技术识别植物并提供详细信息。
+基于 Taro 和 EMAS Serverless 的植物识别微信小程序。
 
-## ✨ 功能特性
+## 功能特性
 
-- 🌿 **AI植物识别** - 拍照或选择图片快速识别植物
-- 📱 **简洁界面** - 现代化设计，操作简单直观
-- 🎯 **专注核心** - 专注于植物识别功能，去除复杂功能
+- 📸 拍照识别植物
+- 🔍 植物信息查询
+- 📱 微信小程序原生体验
+- ☁️ EMAS Serverless 云函数支持
 
-## 🏗️ 项目结构
+## 技术栈
 
-```
-src/
-├── pages/                 # 页面目录
-│   ├── index/            # 首页 - 主要入口
-│   └── identify/         # 植物识别页面
-├── config/               # 配置文件
-├── utils/                # 工具函数
-├── types/                # 类型定义
-└── assets/               # 静态资源
-```
+- **前端**: Taro + React + TypeScript
+- **后端**: EMAS Serverless
+- **AI服务**: 百度AI植物识别API
 
-## 🚀 快速开始
+## 快速开始
 
-### 环境要求
-
-- Node.js >= 14
-- 微信开发者工具
-- 百度AI开放平台账号（用于植物识别API）
-
-### 环境配置
-
-1. **配置云开发环境ID**
-   编辑 `src/config/cloud.local.js` 文件：
-   ```javascript
-   module.exports = {
-     CLOUD_CONFIG: {
-       ENV_ID: 'your_cloud_env_id_here' // 替换为你的真实云环境ID
-     }
-   }
-   ```
-
-2. **配置微信小程序AppID**
-   编辑 `project.config.local.json` 文件：
-   ```json
-   {
-     "appid": "your_wechat_appid_here"
-   }
-   ```
-
-3. **获取百度AI API密钥**
-   - 访问 [百度AI开放平台](https://ai.baidu.com/)
-   - 创建应用并获取 API Key 和 Secret Key
-   - 确保开通植物识别服务
-
-4. **配置微信小程序**
-   - 在微信公众平台创建小程序
-   - 获取 AppID
-   - 开通云开发服务，获取环境ID
-
-5. **配置云函数环境变量**
-   - 在微信开发者工具中打开云开发控制台
-   - 在云函数 `identifyPlant` 中设置环境变量：
-     - `BAIDU_API_KEY`: 你的百度API Key
-     - `BAIDU_SECRET_KEY`: 你的百度Secret Key
-
-### 安装依赖
+### 1. 安装依赖
 
 ```bash
 npm install
 ```
 
-### 开发模式
+### 2. 配置环境
+
+复制配置模板文件：
+```bash
+cp src/config/cloud.local.example.js src/config/cloud.local.js
+```
+
+编辑 `src/config/cloud.local.js`，填入真实配置：
+- 微信小程序 AppID
+- EMAS Serverless Space ID 和 Client Secret
+
+### 3. 配置云函数
+
+编辑 `emas-functions/identifyPlant/index.js`，在 `BAIDU_CONFIG` 中填入百度AI API密钥。
+
+### 4. 打包云函数
+
+```bash
+npm run package:function
+```
+
+### 5. 部署云函数
+
+1. 登录 [EMAS 控制台](https://emas.console.aliyun.com/)
+2. 进入项目 > Serverless > 云函数
+3. 上传 `emas-functions/identifyPlant/identifyPlant.zip`
+
+### 6. 运行项目
 
 ```bash
 npm run dev:weapp
 ```
 
-### 构建生产版本
+## 项目结构
 
-```bash
-npm run build:weapp
+```
+├── src/
+│   ├── pages/          # 页面文件
+│   ├── components/     # 组件文件
+│   ├── utils/          # 工具函数
+│   └── config/         # 配置文件
+├── emas-functions/     # EMAS 云函数
+└── scripts/           # 构建脚本
 ```
 
-### 部署云函数
+## 注意事项
 
-1. 在微信开发者工具中右键点击 `cloudfunctions/identifyPlant`
-2. 选择"上传并部署：云端安装依赖"
-3. 确保云函数部署成功
+⚠️ **安全提醒**：
+- 请勿将 `src/config/cloud.local.js` 提交到版本控制
+- 云函数中的API密钥需要手动配置，不要提交真实密钥
+- 生产环境请使用独立的API密钥
 
-## 📱 页面说明
-
-### 首页 (index)
-- 简洁的顶部导航栏
-- 主内容卡片展示
-- 底部操作按钮（相册、拍照、分类）
-
-### 植物识别 (identify)
-- 相机拍照识别
-- 相册图片选择
-- AI识别结果展示
-
-## 🎨 UI设计特点
-
-- **简洁风格** - 采用现代简约设计语言
-- **绿色主题** - 以植物绿色为主色调
-- **卡片布局** - 清晰的信息层次结构
-- **响应式设计** - 适配不同屏幕尺寸
-
-## 🔧 技术栈
-
-- **框架**: Taro 3.6.8
-- **UI组件**: Taro UI
-- **开发语言**: TypeScript
-- **样式**: SCSS
-- **云服务**: 微信云开发
-
-## 📝 更新日志
-
-### v1.1.0
-- 全新UI设计，采用简洁现代风格
-- 移除复杂功能，专注于核心识别
-- 优化用户交互体验
-- 绿色主题设计，符合植物应用定位
-
-### v1.0.0
-- 移除 Tab 页导航，改为单页面应用
-- 简化用户登录流程
-- 优化页面导航体验
-- 统一页面样式设计
-- 移除历史记录和个人中心功能
-- 简化首页内容，专注于核心识别功能
-
-## 🤝 贡献
-
-欢迎提交 Issue 和 Pull Request！
-
-## �� 许可证
+## 许可证
 
 MIT License
-
-## 🔒 安全说明
-
-### 敏感信息处理
-
-本项目已移除所有硬编码的敏感信息，包括：
-- 百度AI API密钥
-- 微信小程序AppID
-- 云开发环境ID
-
-### 配置管理
-
-- 云开发环境ID在 `src/config/cloud.local.js` 中配置（本地文件，不提交到版本控制）
-- 微信小程序AppID在 `project.config.local.json` 中配置（本地文件，不提交到版本控制）
-- 百度AI密钥在云函数环境变量中管理
-- 所有敏感信息都已从代码中移除
-- 使用配置模板文件确保安全
-
-### 部署注意事项
-
-1. **生产环境**：确保在云函数中正确设置环境变量
-2. **开发环境**：修改配置文件中的占位符为真实值
-3. **版本控制**：永远不要提交包含真实密钥的配置文件
-4. **配置安全**：所有敏感配置文件都已加入 `.gitignore` 

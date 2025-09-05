@@ -20,6 +20,11 @@ src/config/cloud.local.ts
 src/config/cloud.local.js
 project.config.local.json
 
+# 云函数打包文件
+emas-functions/*/node_modules/
+emas-functions/*/*.zip
+emas-functions/*/package-lock.json
+
 # 日志文件
 *.log
 logs/
